@@ -109,7 +109,7 @@ bool createSensors(
                    R"(peci-\d+/\d+-.+/peci-.+/hwmon/hwmon\d+/name$)",
                    hwmonNamePaths, 1))
     {
-        std::cerr << "No CPU sensors in system\n";
+        std::cerr << "No CPU sensors in system" << std::endl;
         return true;
     }
 
@@ -133,7 +133,7 @@ bool createSensors(
         auto findHyphen = deviceName.find("-");
         if (findHyphen == std::string::npos)
         {
-            std::cerr << "found bad device " << deviceName << "\n";
+            std::cerr << "found bad device " << deviceName << std::endl;
             continue;
         }
         std::string busStr = deviceName.substr(0, findHyphen);
@@ -154,7 +154,7 @@ bool createSensors(
         std::ifstream nameFile(hwmonNamePath);
         if (!nameFile.good())
         {
-            std::cerr << "Failure reading " << hwmonNamePath << "\n";
+            std::cerr << "Failure reading " << hwmonNamePath << std::endl;
             continue;
         }
         std::string hwmonName;
@@ -168,7 +168,7 @@ bool createSensors(
         if (DEBUG)
         {
             std::cout << "Checking: " << hwmonNamePath << ": " << hwmonName
-                      << "\n";
+                      << std::endl;
         }
 
         std::string sensorType;
@@ -195,7 +195,7 @@ bool createSensors(
             if (baseConfiguration == nullptr)
             {
                 std::cerr << "error finding base configuration for" << hwmonName
-                          << "\n";
+                          << std::endl;
                 continue;
             }
             auto configurationBus = baseConfiguration->second.find("Bus");
@@ -222,14 +222,15 @@ bool createSensors(
         }
         if (interfacePath == nullptr)
         {
-            std::cerr << "failed to find match for " << hwmonName << "\n";
+            std::cerr << "failed to find match for " << hwmonName << std::endl;
             continue;
         }
 
         auto findCpuId = baseConfiguration->second.find("CpuID");
         if (findCpuId == baseConfiguration->second.end())
         {
-            std::cerr << "could not determine CPU ID for " << hwmonName << "\n";
+            std::cerr << "could not determine CPU ID for " << hwmonName
+                      << std::endl;
             continue;
         }
         int cpuId =
@@ -239,7 +240,7 @@ bool createSensors(
         std::vector<fs::path> inputPaths;
         if (!findFiles(fs::path(directory), R"(temp\d+_input$)", inputPaths, 0))
         {
-            std::cerr << "No temperature sensors in system\n";
+            std::cerr << "No temperature sensors in system" << std::endl;
             continue;
         }
 
@@ -252,7 +253,7 @@ bool createSensors(
             std::ifstream labelFile(labelPath);
             if (!labelFile.good())
             {
-                std::cerr << "Failure reading " << labelPath << "\n";
+                std::cerr << "Failure reading " << labelPath << std::endl;
                 continue;
             }
             std::string label;
@@ -266,7 +267,7 @@ bool createSensors(
                 if (DEBUG)
                 {
                     std::cout << "Skipped: " << inputPath << ": " << sensorName
-                              << " is already created\n";
+                              << " is already created" << std::endl;
                 }
                 continue;
             }
@@ -281,7 +282,7 @@ bool createSensors(
                                              CPUSensor::sensorScaleFactor))
                 {
                     std::cerr << "error populating thresholds for "
-                              << sensorName << "\n";
+                              << sensorName << std::endl;
                 }
             }
             sensors[sensorName] = std::make_unique<CPUSensor>(
@@ -291,7 +292,7 @@ bool createSensors(
             if (DEBUG)
             {
                 std::cout << "Mapped: " << inputPath << " to " << sensorName
-                          << "\n";
+                          << std::endl;
             }
         }
     }
@@ -299,7 +300,7 @@ bool createSensors(
     if (createdSensors.size())
     {
         std::cout << "Sensor" << (createdSensors.size() == 1 ? " is" : "s are")
-                  << " created\n";
+                  << " created" << std::endl;
     }
 
     return true;
@@ -332,7 +333,7 @@ void exportDevice(const CPUConfig& config)
             if (DEBUG)
             {
                 std::cout << parameters << " on bus " << busStr
-                          << " is already exported\n";
+                          << " is already exported" << std::endl;
             }
             return;
         }
@@ -341,13 +342,14 @@ void exportDevice(const CPUConfig& config)
     std::ofstream deviceFile(device);
     if (!deviceFile.good())
     {
-        std::cerr << "Error writing " << device << "\n";
+        std::cerr << "Error writing " << device << std::endl;
         return;
     }
     deviceFile << parameters;
     deviceFile.close();
 
-    std::cout << parameters << " on bus " << busStr << " is exported\n";
+    std::cout << parameters << " on bus " << busStr << " is exported"
+              << std::endl;
 }
 
 void detectCpu(boost::asio::deadline_timer& timer, boost::asio::io_service& io,
@@ -366,7 +368,7 @@ void detectCpu(boost::asio::deadline_timer& timer, boost::asio::io_service& io,
         auto file = open(peciDevPath.c_str(), O_RDWR | O_CLOEXEC);
         if (file < 0)
         {
-            std::cerr << "unable to open " << peciDevPath << "\n";
+            std::cerr << "unable to open " << peciDevPath << std::endl;
             std::exit(EXIT_FAILURE);
         }
 
@@ -418,13 +420,13 @@ void detectCpu(boost::asio::deadline_timer& timer, boost::asio::io_service& io,
         {
             if (config.state == State::OFF)
             {
-                std::cout << config.name << " is detected\n";
+                std::cout << config.name << " is detected" << std::endl;
                 exportDevice(config);
             }
             if (state == State::READY)
             {
-                std::cout << "DIMM(s) on " << config.name
-                          << " is/are detected\n";
+                std::cout << "DIMM(s) on " << config.name << " is/are detected"
+                          << std::endl;
             }
             config.state = state;
         }
@@ -448,7 +450,8 @@ void detectCpu(boost::asio::deadline_timer& timer, boost::asio::io_service& io,
 
         if (DEBUG)
         {
-            std::cout << config.name << ", state: " << config.state << "\n";
+            std::cout << config.name << ", state: " << config.state
+                      << std::endl;
         }
     }
 
@@ -472,7 +475,7 @@ void detectCpu(boost::asio::deadline_timer& timer, boost::asio::io_service& io,
             }
             else if (ec)
             {
-                std::cerr << "timer error\n";
+                std::cerr << "timer error" << std::endl;
                 return;
             }
             detectCpu(timer, io, objectServer, sensors, configs,
@@ -527,7 +530,8 @@ bool getCpuConfig(const std::shared_ptr<sdbusplus::asio::connection>& systemBus,
                 auto findBus = config.second.find("Bus");
                 if (findBus == config.second.end())
                 {
-                    std::cerr << "Can't find 'Bus' setting in " << name << "\n";
+                    std::cerr << "Can't find 'Bus' setting in " << name
+                              << std::endl;
                     continue;
                 }
                 uint64_t bus = variant_ns::visit(VariantToUnsignedIntVisitor(),
@@ -537,7 +541,7 @@ bool getCpuConfig(const std::shared_ptr<sdbusplus::asio::connection>& systemBus,
                 if (findAddress == config.second.end())
                 {
                     std::cerr << "Can't find 'Address' setting in " << name
-                              << "\n";
+                              << std::endl;
                     continue;
                 }
                 uint64_t addr = variant_ns::visit(VariantToUnsignedIntVisitor(),
@@ -545,10 +549,10 @@ bool getCpuConfig(const std::shared_ptr<sdbusplus::asio::connection>& systemBus,
 
                 if (DEBUG)
                 {
-                    std::cout << "bus: " << bus << "\n";
-                    std::cout << "addr: " << addr << "\n";
-                    std::cout << "name: " << name << "\n";
-                    std::cout << "type: " << type << "\n";
+                    std::cout << "bus: " << bus << std::endl;
+                    std::cout << "addr: " << addr << std::endl;
+                    std::cout << "name: " << name << std::endl;
+                    std::cout << "type: " << type << std::endl;
                 }
 
                 configs.emplace(bus, addr, name, State::OFF);
@@ -559,7 +563,7 @@ bool getCpuConfig(const std::shared_ptr<sdbusplus::asio::connection>& systemBus,
     if (configs.size())
     {
         std::cout << "CPU config" << (configs.size() == 1 ? " is" : "s are")
-                  << " parsed\n";
+                  << " parsed" << std::endl;
         return true;
     }
 
@@ -588,7 +592,7 @@ int main(int argc, char** argv)
         }
         else if (ec)
         {
-            std::cerr << "timer error\n";
+            std::cerr << "timer error" << std::endl;
             return;
         }
 
@@ -602,13 +606,13 @@ int main(int argc, char** argv)
         [&](sdbusplus::message::message& message) {
             if (message.is_method_error())
             {
-                std::cerr << "callback method error\n";
+                std::cerr << "callback method error" << std::endl;
                 return;
             }
 
             if (DEBUG)
             {
-                std::cout << message.get_path() << " is changed\n";
+                std::cout << message.get_path() << " is changed" << std::endl;
             }
 
             // this implicitly cancels the timer
@@ -621,7 +625,7 @@ int main(int argc, char** argv)
                 }
                 else if (ec)
                 {
-                    std::cerr << "timer error\n";
+                    std::cerr << "timer error" << std::endl;
                     return;
                 }
 

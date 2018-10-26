@@ -49,7 +49,7 @@ void createSensors(
         if (!getSensorConfiguration(type, dbusConnection, sensorConfigurations,
                                     useCache))
         {
-            std::cerr << "error communicating to entity manager\n";
+            std::cerr << "error communicating to entity manager" << std::endl;
             return;
         }
         useCache = true;
@@ -57,7 +57,7 @@ void createSensors(
     std::vector<fs::path> paths;
     if (!findFiles(fs::path("/sys/class/hwmon"), R"(temp\d+_input)", paths))
     {
-        std::cerr << "No temperature sensors in system\n";
+        std::cerr << "No temperature sensors in system" << std::endl;
         return;
     }
 
@@ -82,7 +82,7 @@ void createSensors(
         auto findHyphen = deviceName.find("-");
         if (findHyphen == std::string::npos)
         {
-            std::cerr << "found bad device " << deviceName << "\n";
+            std::cerr << "found bad device " << deviceName << std::endl;
             continue;
         }
         std::string busStr = deviceName.substr(0, findHyphen);
@@ -123,7 +123,7 @@ void createSensors(
             if (baseConfiguration == nullptr)
             {
                 std::cerr << "error finding base configuration for "
-                          << deviceName << "\n";
+                          << deviceName << std::endl;
                 continue;
             }
             auto configurationBus = baseConfiguration->second.find("Bus");
@@ -150,7 +150,7 @@ void createSensors(
         }
         if (interfacePath == nullptr)
         {
-            std::cerr << "failed to find match for " << deviceName << "\n";
+            std::cerr << "failed to find match for " << deviceName << std::endl;
             continue;
         }
 
@@ -158,7 +158,7 @@ void createSensors(
         if (findSensorName == baseConfiguration->second.end())
         {
             std::cerr << "could not determine configuration name for "
-                      << deviceName << "\n";
+                      << deviceName << std::endl;
             continue;
         }
         std::string sensorName =
@@ -189,7 +189,7 @@ void createSensors(
         if (!parseThresholdsFromConfig(*sensorData, sensorThresholds))
         {
             std::cerr << "error populating thresholds for " << sensorName
-                      << "\n";
+                      << std::endl;
         }
 
         sensors[sensorName] = std::make_unique<HwmonTempSensor>(
@@ -232,7 +232,7 @@ int main(int argc, char** argv)
         [&](sdbusplus::message::message& message) {
             if (message.is_method_error())
             {
-                std::cerr << "callback method error\n";
+                std::cerr << "callback method error" << std::endl;
                 return;
             }
             sensorsChanged->insert(message.get_path());
@@ -247,7 +247,7 @@ int main(int argc, char** argv)
                 }
                 else if (ec)
                 {
-                    std::cerr << "timer error\n";
+                    std::cerr << "timer error" << std::endl;
                     return;
                 }
                 createSensors(io, objectServer, sensors, systemBus,

@@ -55,7 +55,7 @@ void createSensors(
         if (!getSensorConfiguration(type, dbusConnection, sensorConfigurations,
                                     useCache))
         {
-            std::cerr << "error communicating to entity manager\n";
+            std::cerr << "error communicating to entity manager" << std::endl;
             return;
         }
         useCache = true;
@@ -63,7 +63,7 @@ void createSensors(
     std::vector<fs::path> paths;
     if (!findFiles(fs::path("/sys/class/hwmon"), R"(fan\d+_input)", paths))
     {
-        std::cerr << "No temperature sensors in system\n";
+        std::cerr << "No temperature sensors in system" << std::endl;
         return;
     }
 
@@ -110,7 +110,8 @@ void createSensors(
                 sensor.second.find(baseType + std::string(".Connector"));
             if (connector == sensor.second.end())
             {
-                std::cerr << baseConfiguration->first << " missing connector\n";
+                std::cerr << baseConfiguration->first << " missing connector"
+                          << std::endl;
                 continue;
             }
             auto findPwmIndex = connector->second.find("Pwm");
@@ -125,7 +126,7 @@ void createSensors(
 
             if (DEBUG)
             {
-                std::cout << "Checking path " << oemNamePath << "\n";
+                std::cout << "Checking path " << oemNamePath << std::endl;
             }
             std::ifstream nameFile(oemNamePath);
             if (!nameFile.good())
@@ -144,7 +145,8 @@ void createSensors(
             auto findIndex = baseConfiguration->second.find("Index");
             if (findIndex == baseConfiguration->second.end())
             {
-                std::cerr << baseConfiguration->first << " missing index\n";
+                std::cerr << baseConfiguration->first << " missing index"
+                          << std::endl;
                 continue;
             }
             unsigned int configIndex = variant_ns::visit(
@@ -171,7 +173,8 @@ void createSensors(
         }
         if (sensorData == nullptr)
         {
-            std::cerr << "failed to find match for " << path.string() << "\n";
+            std::cerr << "failed to find match for " << path.string()
+                      << std::endl;
             continue;
         }
 
@@ -179,7 +182,7 @@ void createSensors(
         if (findSensorName == baseConfiguration->second.end())
         {
             std::cerr << "could not determine configuration name for "
-                      << path.string() << "\n";
+                      << path.string() << std::endl;
             continue;
         }
         std::string sensorName =
@@ -210,7 +213,7 @@ void createSensors(
         if (!parseThresholdsFromConfig(*sensorData, sensorThresholds))
         {
             std::cerr << "error populating thresholds for " << sensorName
-                      << "\n";
+                      << std::endl;
         }
 
         tachSensors[sensorName] = std::make_unique<TachSensor>(
@@ -220,7 +223,7 @@ void createSensors(
     std::vector<fs::path> pwms;
     if (!findFiles(fs::path("/sys/class/hwmon"), R"(pwm\d+)", pwms))
     {
-        std::cerr << "No pwm in system\n";
+        std::cerr << "No pwm in system" << std::endl;
         return;
     }
     for (const fs::path& pwm : pwms)
@@ -256,7 +259,7 @@ int main(int argc, char** argv)
         [&](sdbusplus::message::message& message) {
             if (message.is_method_error())
             {
-                std::cerr << "callback method error\n";
+                std::cerr << "callback method error" << std::endl;
                 return;
             }
             sensorsChanged->insert(message.get_path());
@@ -271,7 +274,7 @@ int main(int argc, char** argv)
                 }
                 else if (ec)
                 {
-                    std::cerr << "timer error\n";
+                    std::cerr << "timer error" << std::endl;
                     return;
                 }
                 createSensors(io, objectServer, tachSensors, pwmSensors,

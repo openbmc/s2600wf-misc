@@ -122,7 +122,7 @@ void CPUSensor::handleResponse(const boost::system::error_code &err)
         if (isPowerOn(dbusConnection))
         {
             std::cerr << "Failure to read sensor " << name << " at " << path
-                      << "\n";
+                      << std::endl;
             updateValue(0);
             errCount++;
         }
@@ -208,12 +208,13 @@ void CPUSensor::setInitialProperties(
         }
         else
         {
-            std::cerr << "Unknown threshold level" << threshold.level << "\n";
+            std::cerr << "Unknown threshold level" << threshold.level
+                      << std::endl;
             continue;
         }
         if (!iface)
         {
-            std::cout << "trying to set uninitialized interface\n";
+            std::cout << "trying to set uninitialized interface" << std::endl;
             continue;
         }
         if (threshold.writeable)
@@ -236,15 +237,17 @@ void CPUSensor::setInitialProperties(
     }
     if (!sensorInterface->initialize())
     {
-        std::cerr << "error initializing value interface\n";
+        std::cerr << "error initializing value interface" << std::endl;
     }
     if (thresholdInterfaceWarning && !thresholdInterfaceWarning->initialize())
     {
-        std::cerr << "error initializing warning threshold interface\n";
+        std::cerr << "error initializing warning threshold interface"
+                  << std::endl;
     }
 
     if (thresholdInterfaceCritical && !thresholdInterfaceCritical->initialize())
     {
-        std::cerr << "error initializing critical threshold interface\n";
+        std::cerr << "error initializing critical threshold interface"
+                  << std::endl;
     }
 }

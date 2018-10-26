@@ -51,7 +51,7 @@ void createSensors(
         if (!getSensorConfiguration(type, dbusConnection, sensorConfigurations,
                                     useCache))
         {
-            std::cerr << "error communicating to entity manager\n";
+            std::cerr << "error communicating to entity manager" << std::endl;
             return;
         }
         useCache = true;
@@ -59,7 +59,7 @@ void createSensors(
     std::vector<fs::path> paths;
     if (!findFiles(fs::path("/sys/class/hwmon"), R"(in\d+_input)", paths))
     {
-        std::cerr << "No temperature sensors in system\n";
+        std::cerr << "No temperature sensors in system" << std::endl;
         return;
     }
 
@@ -81,12 +81,12 @@ void createSensors(
 
         if (DEBUG)
         {
-            std::cout << "Checking path " << oemNamePath << "\n";
+            std::cout << "Checking path " << oemNamePath << std::endl;
         }
         std::ifstream nameFile(oemNamePath);
         if (!nameFile.good())
         {
-            std::cerr << "Failure reading " << oemNamePath << "\n";
+            std::cerr << "Failure reading " << oemNamePath << std::endl;
             continue;
         }
         std::string oemName;
@@ -114,7 +114,7 @@ void createSensors(
         }
         if (sensorData == nullptr)
         {
-            std::cerr << "failed to find match for " << oemName << "\n";
+            std::cerr << "failed to find match for " << oemName << std::endl;
             continue;
         }
         const std::pair<std::string, boost::container::flat_map<
@@ -133,7 +133,7 @@ void createSensors(
         if (baseConfiguration == nullptr)
         {
             std::cerr << "error finding base configuration for" << oemName
-                      << "\n";
+                      << std::endl;
             continue;
         }
 
@@ -141,7 +141,7 @@ void createSensors(
         if (findSensorName == baseConfiguration->second.end())
         {
             std::cerr << "could not determine configuration name for "
-                      << oemName << "\n";
+                      << oemName << std::endl;
             continue;
         }
         std::string sensorName =
@@ -173,7 +173,7 @@ void createSensors(
         if (!parseThresholdsFromConfig(*sensorData, sensorThresholds))
         {
             std::cerr << "error populating thresholds for " << sensorName
-                      << "\n";
+                      << std::endl;
         }
 
         auto findScaleFactor = baseConfiguration->second.find("ScaleFactor");
@@ -209,7 +209,7 @@ int main(int argc, char** argv)
         [&](sdbusplus::message::message& message) {
             if (message.is_method_error())
             {
-                std::cerr << "callback method error\n";
+                std::cerr << "callback method error" << std::endl;
                 return;
             }
             sensorsChanged->insert(message.get_path());
@@ -224,7 +224,7 @@ int main(int argc, char** argv)
                 }
                 else if (ec)
                 {
-                    std::cerr << "timer error\n";
+                    std::cerr << "timer error" << std::endl;
                     return;
                 }
                 createSensors(io, objectServer, sensors, systemBus,

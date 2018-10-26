@@ -77,7 +77,7 @@ bool parseThresholdsFromConfig(
             severityFind == item.second.end() ||
             directionFind == item.second.end())
         {
-            std::cerr << "Malformed threshold in configuration\n";
+            std::cerr << "Malformed threshold in configuration" << std::endl;
             return false;
         }
         Level level;
@@ -132,7 +132,8 @@ void persistThreshold(const std::string &path, const std::string &baseInterface,
                 if (valueFind == result.end() || severityFind == result.end() ||
                     directionFind == result.end())
                 {
-                    std::cerr << "Malformed threshold in configuration\n";
+                    std::cerr << "Malformed threshold in configuration"
+                              << std::endl;
                     return;
                 }
                 unsigned int level = variant_ns::visit(
@@ -152,7 +153,7 @@ void persistThreshold(const std::string &path, const std::string &baseInterface,
                         if (ec)
                         {
                             std::cerr << "Error setting threshold " << ec
-                                      << "\n";
+                                      << std::endl;
                         }
                     },
                     entityManagerName, path, "org.freedesktop.DBus.Properties",
@@ -237,12 +238,12 @@ void assertThresholds(Sensor *sensor, thresholds::Level level,
     else
     {
         std::cerr << "Unknown threshold, level " << level << "direction "
-                  << direction << "\n";
+                  << direction << std::endl;
         return;
     }
     if (!interface)
     {
-        std::cout << "trying to set uninitialized interface\n";
+        std::cout << "trying to set uninitialized interface" << std::endl;
         return;
     }
     interface->set_property(property, assert);
@@ -289,7 +290,7 @@ bool parseThresholdsFromAttr(
 
         if (DEBUG)
         {
-            std::cout << "Threshold: " << attrPath << ": " << val << "\n";
+            std::cout << "Threshold: " << attrPath << ": " << val << std::endl;
         }
 
         thresholdVector.emplace_back(level, direction, val);

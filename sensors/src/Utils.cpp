@@ -56,7 +56,7 @@ bool getSensorConfiguration(
 
         if (err)
         {
-            std::cerr << "Error communicating to entity manager\n";
+            std::cerr << "Error communicating to entity manager" << std::endl;
             return false;
         }
     }
@@ -146,7 +146,7 @@ bool isPowerOn(const std::shared_ptr<sdbusplus::asio::connection>& conn)
                          const sdbusplus::message::variant<int32_t>& pgood) {
             if (ec)
             {
-                std::cerr << "Error getting initial power status\n";
+                std::cerr << "Error getting initial power status" << std::endl;
                 return;
             }
             powerStatusOn = sdbusplus::message::variant_ns::get<int32_t>(pgood);
