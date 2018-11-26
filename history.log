@@ -1,0 +1,714 @@
+commit 722ae749dbc721873dc0e2448bf47e6273d1ec52
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Aug 31 12:05:21 2018 -0700
+
+    Update clang-format
+    
+    Update to new openbmc standard.
+    
+    Change-Id: I421866b4faf738409f6d603e8a3606009523202d
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 6d0c7fe1b43c55ffa4a76d41c97ddeaf0be2c438
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Mon Aug 27 17:37:08 2018 -0700
+
+    Make Hunter off by default
+    
+    This accidently got deleted during upgrade.
+    
+    Change-Id: I58fb4d9caae13bface7d4bcb67f5256cc71a87ec
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 1ceff4a56cdd4cb1733e4bce0c56c5987d7770a0
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Thu Aug 9 14:48:46 2018 -0700
+
+    Stop sensors from segfaulting
+    
+    catch sdbusplus errors
+    
+    Change-Id: Ia96b37d375af152a76e59493ff11dfc38d50dc87
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 1a72218d51dcb5b5a9c210b15394ddb713699545
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Aug 7 15:40:41 2018 -0700
+
+    Make out of tree builds work again
+    
+    This now builds sdbusplus as it must be linked against.
+    Also cmake-format format the file.
+    
+    Change-Id: I3e869b7ace0254ac153c723d2e3c87e659e4d5d6
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 5446b4551064f46d28aaf43a74f3f632da642766
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Mon Aug 6 14:41:54 2018 -0700
+
+    Change all properties to Upper Camel Case
+    
+    Change to match entity manager case fix.
+    
+    Tested-By: Verfied sensor list output same
+    Change-Id: Ic1e41e31b28c61d3ef45d0937edbbaf55cfa06af
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit b02f18ff15e64a71a5b28e64f9394e3daee7e071
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Jul 11 10:44:51 2018 -0700
+
+    Make isPowerOn async
+    
+    isPowerOn was killing the response time of fan sensor
+    when power was off. Make it a match.
+    
+    Change-Id: If1396cb595ec85979940cef570b87cfd576db555
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit f734aea02ed571910f571a6c56bbfceab4fc49f2
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Thu Jul 19 16:03:41 2018 -0700
+
+    Change reading name from entity-manager to Name
+    
+    Change-Id: Ia0a72dcf04bafd0208a17260187d9ed961c70da8
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit c6fc5b668d222471e6755faa6dc42e1a3822e496
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Jul 6 14:41:54 2018 -0700
+
+    Add PWM Sensor
+    
+    Add pwm sensor for fan control to use.
+    
+    Change-Id: Ibb237415b245d31a70c69748ee4be6367f5eb219
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 3fa34f5ae31738ffbfa26a3e25333d756bd323ab
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Jul 6 12:09:40 2018 -0700
+
+    Move Sensors path to sensors
+    
+    Upstream uses lowercase paths, fix it.
+    
+    Change-Id: I16e3c8ec6d6457ec10376a65bea05a8767f77591
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 9123255ab3e3047d25df4799bdd5589cdafef70c
+Merge: 5338775 be5c41e
+Author: Feist, James <james.feist@intel.com>
+Date:   Mon Jul 2 11:07:26 2018 -0700
+
+    Merge "Add setable thresholds to hwmontempsensor"
+
+commit be5c41e37bc5bf8d2e365c5c0a9073cb3da723e2
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Jun 6 11:49:08 2018 -0700
+
+    Add setable thresholds to hwmontempsensor
+    
+    This allows the hwmontempsensor sensor to set and persist
+    its threshold values via dbus. It uses the properites set
+    to call the entity manager and update the threshold.
+    
+    Change-Id: Ida526055bd3d7e9ae709ab22c01f0b9d74dd95d8
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 5338775ff3a9c17ee47863c826ecf517c52d3466
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Jun 13 14:41:37 2018 -0700
+
+    Add setable thresholds to CPU sensors
+    
+    If thresholds are defined for CPU sensors then allow
+    them to be set. Don't allow them to be set if they are
+    pulled from the CPU. Currently tested using DIMMs.
+    
+    Change-Id: Ic2a957ba0fdf70332ecfb2dfee6ff2bd483dd934
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 5a3834e50493173b4692a20c417d9d0e6fcbe833
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Jun 13 11:18:58 2018 -0700
+
+    Add setable thresholds to tachsensor
+    
+    This allows the tachsensor sensor to set and persist
+    its threshold values via dbus. It uses the properites set
+    to call the entity manager and update the threshold.
+    
+    Change-Id: I3e3ee8811868136b605e99e6fc24f0764f88d12c
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit d0196639c21b2cca23ffddac9ea37cfd3ae0270f
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Jun 6 11:49:08 2018 -0700
+
+    Add setable thresholds to adc sensor
+    
+    This allows the adc sensor to set and persist its
+    threshold values via dbus. It uses the properites set
+    to call the entity manager and update the threshold.
+    
+    Change-Id: I963eec31a05e2d15985ab339dbeefa07dcfb6b9f
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit ad2e90db555521e1bba4d3350958f0d6dd35132f
+Merge: aa3fa4a 52e515e
+Author: Feist, James <james.feist@intel.com>
+Date:   Tue Jun 12 09:45:32 2018 -0700
+
+    Merge "Fix bad default scale factor for voltage sensors"
+
+commit 52e515e553f72bac3f35379723c6e29ecf2f5fdb
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Mon Jun 11 16:05:38 2018 -0700
+
+    Fix bad default scale factor for voltage sensors
+    
+    Default should be 1.0, not 0 which does a divide by 0.
+    
+    Change-Id: Icb658990d22b14986ef5fe20571dc6dcb73181a8
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit aa3fa4a950d3934d80d7f30e43c1f388b3c35587
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Jun 8 09:57:19 2018 -0700
+
+    Get oemname file from connector
+    
+    The connector is a much more reliable source of information,
+    this gets rid of needing to do the awkward divide by 2
+    that we use for 1u configurations.
+    
+    Change-Id: I6264cecc357e98b8601b9b33c27a526288fc7954
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 4b9ed8f2119cda51bd99c63115037c89d6550746
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Jun 1 13:59:55 2018 -0700
+
+    Get managed objects at root and remove boost-dbus
+    
+    This is to keep in sync with entity manager change.
+    Also remove all traces of boost-dbus as all sensors
+    have been updated.
+    
+    Change-Id: Id53f77ad055cac86fa8dc3f18566ec5f3d189d1a
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 160f39a4d92ffe26706ad3ff8481f2e762024bb9
+Merge: b378761 5fe3c8b
+Author: Mauery, Vernon <vernon.mauery@intel.com>
+Date:   Tue Jun 5 09:30:19 2018 -0700
+
+    Merge "Update cpusensor to support PECI v5"
+
+commit b37876130d1e0388f8ade8b940ae2a9764c530e6
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Mon Jun 4 11:16:54 2018 -0700
+
+    Link against sdbusplus
+    
+    Can no longer use sdbusplus header only after exception
+    changes.
+    
+    Change-Id: I347ae22a09f1c6a64d5ee307ccff648288971b26
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 5fe3c8b25010ce9c9770dc5fe112fb5a65d608ca
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Thu May 31 10:53:19 2018 -0700
+
+    Update cpusensor to support PECI v5
+    
+    This commit updates cpusensor creation logic to support MFD type
+    PECI hwmon modules in PECI v5.
+    
+    Change-Id: I0a76f66aaa1182226c28b95b65626c36de9b5b96
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 59bafd8c4c49048144013f1ba959910bdde84c4f
+Merge: d50f94b ced4067
+Author: Tanous, Ed <ed.tanous@intel.com>
+Date:   Wed May 30 16:37:33 2018 -0700
+
+    Merge "Update hwmontempsensor"
+
+commit d50f94bd7c6141e4010c75b2df9d9ff0ad2389eb
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed May 23 16:14:30 2018 -0700
+
+    Update CPUSensor
+    
+    Update CPU sensor to sdbusplus and make it not exit when
+    configuration is not yet avaialble. Also modify configuration
+    from vector to set to allow overwriting of configuration.
+    
+    Change-Id: Iede83df362ab3e18f4ebd3bc9a3ce24c573bc36a
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit ced40673a0badc11ebd16dbf6aeeb7208236c92c
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed May 23 14:31:35 2018 -0700
+
+    Update hwmontempsensor
+    
+    Update to sdbusplus and to only reestablish sensors that
+    have had changes.
+    
+    Change-Id: I09b2f4ae571885c3e5cf6d7439c6796dbdd09339
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 252b29e8f9f13ff1137830366b3a9d7ae1d2423b
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed May 23 10:56:53 2018 -0700
+
+    Update Tach Sensor
+    
+    Update to sdbusplus and to only reestablish sensors that
+    have had changes.
+    
+    Change-Id: I803894ca05b8bfb13d6be2e226b9e5fef82b864e
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 4e99a9c3a0932349e5426ae472c5e500a0cd6752
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue May 22 16:06:31 2018 -0700
+
+    Update ADC sensor
+    
+    Move ADC sensor over to sdbusplus and allow it to do a
+    correct hot-reload to load new thresholds from entity
+    manager. Types that use sdbusplus variants end with S
+    for now so that one sensor can be moved over at a time.
+    
+    Change-Id: Id378ce2a64cf4a4f54c69688eafe25a0a847352b
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 0e11699e8b3605bf89c3dde599756add4203d328
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Mon May 21 14:30:29 2018 -0700
+
+    Format CMakeLists.txt
+    
+    Format CMakeLists.txt using cmake_format
+    
+    Change-Id: Icf40c96107c876ad9d962feca910715a97fccb71
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 0d2147adee492d579fbe40e963a4337561fd96e2
+Author: Kuiying Wang <kuiying.wang@intel.com>
+Date:   Wed May 9 14:55:23 2018 +0800
+
+    Modify dbus interface for power control.
+    
+    Switch power control from org to xyz
+    
+    Change-Id: I794127238bf4c7fb8a7d86e6c11ab5c4c15eb7a8
+    Signed-off-by: Kuiying Wang <kuiying.wang@intel.com>
+
+commit f465c93e7fdf4e59dbf52855bf7929a9794c9b1e
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Apr 10 13:56:19 2018 -0700
+
+    Apply upstream clang-format
+    
+    Redo clang-format on this repo.
+    
+    Change-Id: I3df0b6822cd31f94a089c1ba7f3d54d19d4ac5ae
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit bd866ae07dd7d3880a69caf34df7650c1a2c6c73
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Apr 10 12:34:50 2018 -0700
+
+    Prep sensors for interface change
+    
+    Entity manager interfaces are changing to match upstream.
+    This change makes sure that the sensors will still work
+    afterwards.
+    
+    Change-Id: Ibd00884a77446b6f7fb3bb0bc43afe1dd4068783
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 2c0d91f7818952c8a80f0be62275a8fc57e520d4
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Mon Apr 9 10:16:20 2018 -0700
+
+    Add DIMM presence checking logic into cpusensor service
+    
+    This patch adds DIMM presence checking logic into cpusensor service
+    to support memory test behavior of the host BIOS while the host is
+    booting up.
+    
+    Also, adjusted temperature scanning interval of cpusensor from 0.5s
+    to 1s.
+    
+    Change-Id: I5778f6c6ed139f4babf604636c6c15ab2ed24065
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 9cdb006765a1f649113497521508af5f51cebf34
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Apr 6 16:26:04 2018 -0700
+
+    Fix a bug on threshold direction setting logic.
+    
+    This patch fixes a bug of threshold direction assignment code.
+    
+    Change-Id: Ifb159729a60de68cbba37c8848d3ca283fdd8ebe
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 6a75f915db5b7e4444af6642d3f6bba2324ad870
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Apr 6 14:28:42 2018 -0700
+
+    Fix the argument passing way of dbus::connection
+    
+    This commit fixes the argument passing way of dbus::connection in
+    dbus-sensors package from by value to by reference to prevent
+    this error:
+    
+    process 2657: arguments to dbus_connection_send_with_reply() were incorrect, assertion "connection != NULL" failed in file ../../dbus-1.10.20/dbus/dbus-connection.c line 3410.
+    This is normally a bug in some application using the D-Bus library.
+      D-Bus not built with -rdynamic so unable to print a backtrace
+    
+    This log rarely happens in asynchronous calling a function.
+    
+    Also, dbus package is getting the shared pointer of connection by
+    reference according to its definition so this fix would be good.
+    
+    include/dbus/properties.hpp:28:  DbusMethod(const std::string& name, std::shared_ptr<dbus::connection>& conn)
+    include/dbus/properties.hpp:94:                   std::shared_ptr<dbus::connection>& conn, Handler h)
+    include/dbus/properties.hpp:106:                   std::shared_ptr<dbus::connection>& conn, Handler h)
+    include/dbus/properties.hpp:157:                     std::shared_ptr<dbus::connection>& conn)
+    include/dbus/properties.hpp:185:                std::shared_ptr<dbus::connection>& conn)
+    include/dbus/properties.hpp:422:  DbusObjectServer(std::shared_ptr<dbus::connection>& conn) : conn(conn) {
+    include/dbus/properties.hpp:476:  std::shared_ptr<dbus::connection>& get_connection() { return conn; }
+    
+    Change-Id: I0695f99004ff4110ff06033f79da7d903814fbd1
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 35cd4cb7c37c6a154935caa80e16f6958397fd18
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Apr 6 14:22:00 2018 -0700
+
+    Update non-yocto build header in dbus-sensor package
+    
+    This commit update a non-yocto build header in dbus-sensor package
+    to make it sync with the one in kernel.
+    
+    Change-Id: I203e924f791e5f85e1f5e0373bc155200e386721
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 5394d4254b545dd936b8fa2e0f832d69960b157a
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Wed Apr 4 09:29:18 2018 -0700
+
+    Add CPU presence detection logic into cpusensor
+    
+    This commit adds CPU presence detection logic into cpusensor
+    service to support dynamic device tree overlay for PECI hwmon
+    drivers.
+    
+    Change-Id: I46781b603ad64014f2e706a193cfe243d92925d9
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 78bf357cc5035e61acb23a3cf3ae2aa18248c566
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Wed Apr 4 09:42:39 2018 -0700
+
+    Remove a deprecated function
+    
+    This commit removes a deprecated function,
+    ParseThresholdsFromJson() from Threshold module.
+    
+    Change-Id: I208e0666764f1fbac33abb2b3286aeae9128e0ba
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit f159d0738a3b35e1ce4f7c8c8c241bb75b9ec561
+Merge: a99aaa1 3463069
+Author: Feist, James <james.feist@intel.com>
+Date:   Mon Apr 2 10:23:32 2018 -0700
+
+    Merge "Move fansensor over to getting data from dbus"
+
+commit a99aaa1a69eebe73b8509bde3e54d842dca9b347
+Merge: 45db383 c16633b
+Author: Feist, James <james.feist@intel.com>
+Date:   Mon Apr 2 10:23:27 2018 -0700
+
+    Merge "Move adc sensor to get information from dbus"
+
+commit 45db383b6bddc23e9b26e8cab4b4ff3c70553d21
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Mar 30 15:31:39 2018 -0700
+
+    Move cpusensor over to getting data from dbus
+    
+    Also add a label argument handling code into the
+    ParseThresholdsFromConfig().
+    
+    Change-Id: I74c7446237d867cc538b2f05632f829990b98e6f
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 346306959419f4fb745435559530027be30bfafd
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Mar 30 13:30:08 2018 -0700
+
+    Move fansensor over to getting data from dbus
+    
+    Also a few minor error checking things.
+    
+    Change-Id: Ib49bdbe62a5291246faa883568e6adbe4fd72f1f
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit c16633b289865729ff8058fbe1e748c64fc301e4
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Thu Mar 29 13:45:08 2018 -0700
+
+    Move adc sensor to get information from dbus
+    
+    Also add a deadline timer to limit the work done scanning
+    for new sensors on boot.
+    
+    Change-Id: Id20bde8899747ecfabc4015a4a944526504726e3
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit d3b0650cf021a56877e08657d653d556d06b1063
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Mar 30 10:55:18 2018 -0700
+
+    Add a deadline timer into CPUsensor to limit the work done scanning.
+    
+    This patch adds a deadline timer to limit the work done scanning
+    for new sensors on boot.
+    
+    Also fixes local variable names based on the camel case naming rule.
+    
+    Change-Id: I6a71b10db0db9d5a7f7e4b722a7394cef951702b
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 186238f3c7c91ba5e05dd949493182dd646472c2
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Mar 27 16:30:53 2018 -0700
+
+    Move hwmontempsensor to get data from Entity Manager
+    
+    Stop reading json directly, other sensors will be moved
+    along incrementally. Also move sensor value to the value
+    interface, as it was noticed we were not matching upstream.
+    
+    Change-Id: I3c2e72d4acbb8472707924c01fe871cb5e152ec2
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 24d6f231218c5ade5c4480e33c461e0212c2dac5
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Mar 16 14:56:45 2018 -0700
+
+    Block sensor reading of CPU sensors when host is powered down
+    
+    This commit adds a change to block sensor reading of CPU sensors
+    when host is powered down.
+    
+    Change-Id: Ie7a915ef811b2126e40a4c750a700041c7790519
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 19b0f57f469a15b413cbafa8f442a009b7ede8ac
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Thu Mar 22 16:39:35 2018 -0700
+
+    Allow multiple fan types
+    
+    The pmbus driver adds fans for PSU, because of that
+    fan 1 was actually being read as the pmbus fan instead
+    of the baseboard fan. Check oemname before adding to list.
+    
+    Change-Id: I1a93aa6fe1b22a52bc2490afb4005a59f1db1785
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit f070207741e719115344c50aed52081b1894e2ca
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Fri Mar 16 16:52:32 2018 -0700
+
+    Modify threshold parsing logic to support CPUsensor.
+    
+    This commit modifies ParseThresholdsFromJson() code to support
+    CPUsensor.
+    
+    Change-Id: Idfa4641656d5ad8faeec32a1b897c289fe754415
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit 10db5ae5467c47ec026fe62603cb144bc8b98e82
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Mon Mar 19 17:10:39 2018 -0700
+
+    Fix regex string of CPU sensor to improve search speed.
+    
+    This commit fixes the regex string of CPU sensor to make it doesn't
+    search unnecessary files such as 'oemname11' or 'oemname12'. It
+    will search only exactly matched 'oemname1' files with this change.
+    
+    Change-Id: I1d862ba5213c685dd6577031bdf9536f888c6666
+    Signed-off-by: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+
+commit b9abf5ef64b18c672508c9b3d5a85b71f8cf3827
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Thu Mar 15 16:04:27 2018 -0700
+
+    Add fan check for no sensors
+    
+    This sensor was missing this check
+    
+    Change-Id: Ic188d682c612e51826e7a8ea62a4c2298fa15c2a
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 9d1d47080a174b73385fd6c4e7068994d2f8b46d
+Author: Yoo, Jae Hyun <jae.hyun.yoo@intel.com>
+Date:   Tue Mar 13 19:24:19 2018 -0700
+
+    Add CPU sensors
+    
+    This commit adds dbus service for CPU sensors to replace python
+    scripts in sensor emitter. It uses hwmon sysfs label based dbus
+    sensor registration.
+    
+    Change-Id: I49991f99e0e6cdd3f5f288b25ec0720b89c646ae
+    Signed-off-by: Jae Hyun Yoo <jae.hyun.yoo@intel.com>
+
+commit 6ac0dc7c679aac33c4eaa76fd9ec75bb51a1302c
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Mar 2 14:15:24 2018 -0800
+
+    Support HwmonTempSensor adding sensors on the fly
+    
+    This is to get us to the demo. In the future all data
+    will be read from dbus, but this rescan works for today.
+    
+    Change-Id: I196416583cb94517f8e0c79f63f13f66586a0017
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 783f3c603922f010af3321b1be5428fcc75d9dfa
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Wed Feb 28 14:59:15 2018 -0800
+
+    Increment Fan Paths
+    
+    Found a bug where the fan sensor was only reading sensor 1.
+    
+    Change-Id: Ie53191d489f7fc2a5e410ec842aba41202354b5f
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit aa276f7eee8941f62bbf2f3d4d06394f854cee4b
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Feb 2 11:25:51 2018 -0800
+
+    Fix thresholds after new threshold json format
+    
+    Quick fix to read 1d-array thresholds. Also fix fans
+    as we are moving to individual fan objects instead of
+    lumping fanA and fanB together for dual-rotar fans.
+    
+    Change-Id: I56c31d4f595bee65253c1021f6fb08f1f53ea8d5
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 97b83293a7e6bc6728b024be6d1e195da66dca4c
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Dec 15 14:14:36 2017 -0800
+
+    Change fan sensors to 0 based.
+    
+    JSON is being changed to 0 based for ease of understanding.
+    
+    Change-Id: Ic28d6be2b5da8fea0e93436e9b2c33a9dfb8b113
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit de59f4c898d85d5ba3e89cac7d805e2377abb36e
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Fri Dec 8 11:18:51 2017 -0800
+
+    Change json store pointer
+    
+    This was renamed to avoid some confusion.
+    
+    Change-Id: I151e06d4063605a6d95f822851d002531d6954d0
+
+commit 637ebb9bb2e361cac023dbbd347ff77e45607735
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Nov 21 16:20:05 2017 -0800
+
+    Add power state monitoring to fans.
+    
+    Don't throw errors when reading with power state off.
+    
+    Change-Id: I98f71b1f2141fa4db56ad99f647f554fd8f427e6
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 921056009d6324cbbdaf1f612551791556fa21a7
+Author: James Feist <james.feist@linux.intel.com>
+Date:   Tue Nov 21 11:58:45 2017 -0800
+
+    Capitialize threshold
+    
+    Interface needs to be capitialized.
+    
+    Change-Id: I7e081fc008dd7191c47fa0087fd886207c783853
+    Signed-off-by: James Feist <james.feist@linux.intel.com>
+
+commit 893bb223173944809cb39c643521a7f4041ad412
+Author: Feist, James <james.feist@linux.intel.com>
+Date:   Tue Nov 14 16:34:41 2017 -0800
+
+    Add ADC sensor and TMP421 internal sensors
+    
+    Also update boost-dbus sha. Add scale factor to read
+    correct voltages.
+    
+    Also const some things.
+    
+    Change-Id: I0840069874bfe01d0d8d01dc39c9a9369ed6689f
+    Signed-off-by: Feist, James <james.feist@linux.intel.com>
+
+commit 4608e48777dcdb21396f1022a03a8342b67e6cff
+Author: Feist, James <james.feist@linux.intel.com>
+Date:   Fri Nov 10 13:42:41 2017 -0800
+
+    Add well known names to sensors
+    
+    Change-Id: I8aafe79a8f008a2825b2dd87516dba23782e8953
+    Signed-off-by: Feist, James <james.feist@linux.intel.com>
+
+commit 89f80e4a0e22cdb272063d38533dda603881d66d
+Author: Feist, James <james.feist@linux.intel.com>
+Date:   Tue Oct 24 14:18:39 2017 -0700
+
+    Add Temp Sensor and Cleanup threshold logic
+    
+    Threshold logic is now pulled out in 'main' files of sensors,
+    so that sensor objects don't have to have the misfortune of dealing
+    with json. Completely sperate temp sensor from fan sensor. Add
+    some tests.
+    
+    Change-Id: I030a60d75b123ff58a1bfdfe8d9c2a4b4ffb851a
+    Signed-off-by: Feist, James <james.feist@linux.intel.com>
+
+commit d15dcce50bff52b14af6466f3f827a9c84bf947e
+Author: Feist, James <james.feist@linux.intel.com>
+Date:   Tue Sep 19 16:39:07 2017 -0700
+
+    Initial commit
+    
+    "working" temp sensor (thats really a hacked
+    fan sensor).
+    
+    Change-Id: Icab3fe25d3b52bdc99608169aad460a82bc045ad
+
+commit a46ae1cef8f48edd38bbbf9ffd6e8a2487b2c4f7
+Author: sys_tfad <ec_sw_sl_git@intel.com>
+Date:   Tue Oct 17 00:16:20 2017 -0700
+
+    Initial empty repository
