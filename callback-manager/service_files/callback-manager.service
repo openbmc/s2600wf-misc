@@ -1,0 +1,13 @@
+[Unit]
+Description=Callback Manager
+StopWhenUnneeded=false
+
+[Service]
+Type=dbus
+BusName=xyz.openbmc_project.CallbackManager
+Restart=always
+RestartSec=5
+ExecStart=/usr/sbin/callback-manager
+
+[Install]
+WantedBy=multi-user.target
