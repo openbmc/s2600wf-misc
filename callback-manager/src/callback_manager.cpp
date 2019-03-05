@@ -26,20 +26,28 @@ constexpr const char* criticalLedPath =
     "/xyz/openbmc_project/led/groups/status_non_critical";
 constexpr const char* warningLedPath =
     "/xyz/openbmc_project/led/groups/status_degraded";
+constexpr const char* okLedPath = "/xyz/openbmc_project/led/groups/status_ok";
 
 constexpr const char* ledIface = "xyz.openbmc_project.Led.Group";
 constexpr const char* ledAssertProp = "Asserted";
 constexpr const char* ledManagerBusname =
     "xyz.openbmc_project.LED.GroupManager";
 
+enum class StatusSetting
+{
+    none,
+    ok,
+    warn,
+    critical,
+    fatal
+};
+
 std::shared_ptr<sdbusplus::asio::dbus_interface> assertedIface = nullptr;
 
 constexpr const bool debug = false;
 
 // final led state tracking
-bool fatalState = false;
-bool criticalState = false;
-bool warnState = false;
+StatusSetting currentPriority = StatusSetting::none;
 
 // maps of <object-path, <property, asserted>>
 boost::container::flat_map<std::string,
@@ -73,36 +81,77 @@ std::vector<std::string> assertedInMap(
 
 void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn)
 {
-    std::vector<std::pair<std::string, std::variant<bool>>> ledsToSet;
-
     std::vector<std::string> assertedVector = assertedInMap(fatalAssertMap);
     assertedIface->set_property("Fatal", assertedVector);
-
     bool fatal = assertedVector.size();
-    if (fatal != fatalState)
-    {
-        fatalState = fatal;
-        ledsToSet.push_back(std::make_pair(fatalLedPath, fatalState));
-    }
 
     assertedVector = assertedInMap(criticalAssertMap);
     assertedIface->set_property("Critical", assertedVector);
-
     bool critical = assertedVector.size();
-    if (critical != criticalState)
-    {
-        criticalState = critical;
-        ledsToSet.push_back(std::make_pair(criticalLedPath, criticalState));
-    }
 
     assertedVector = assertedInMap(warningAssertMap);
     assertedIface->set_property("Warning", assertedVector);
 
     bool warn = assertedVector.size();
-    if (warn != warnState)
+
+    StatusSetting last = currentPriority;
+
+    if (fatal)
     {
-        warnState = warn;
-        ledsToSet.push_back(std::make_pair(warningLedPath, warnState));
+        currentPriority = StatusSetting::fatal;
+    }
+    else if (critical)
+    {
+        currentPriority = StatusSetting::critical;
+    }
+    else if (warn)
+    {
+        currentPriority = StatusSetting::warn;
+    }
+    else
+    {
+        currentPriority = StatusSetting::ok;
+    }
+
+    std::vector<std::pair<std::string, std::variant<bool>>> ledsToSet;
+
+    if (last != currentPriority)
+    {
+        switch (currentPriority)
+        {
+            case (StatusSetting::fatal):
+            {
+                ledsToSet.push_back(std::make_pair(fatalLedPath, true));
+                ledsToSet.push_back(std::make_pair(criticalLedPath, false));
+                ledsToSet.push_back(std::make_pair(warningLedPath, false));
+                ledsToSet.push_back(std::make_pair(okLedPath, false));
+                break;
+            }
+            case (StatusSetting::critical):
+            {
+                ledsToSet.push_back(std::make_pair(fatalLedPath, false));
+                ledsToSet.push_back(std::make_pair(criticalLedPath, true));
+                ledsToSet.push_back(std::make_pair(warningLedPath, false));
+                ledsToSet.push_back(std::make_pair(okLedPath, false));
+                break;
+            }
+            case (StatusSetting::warn):
+            {
+                ledsToSet.push_back(std::make_pair(fatalLedPath, false));
+                ledsToSet.push_back(std::make_pair(criticalLedPath, false));
+                ledsToSet.push_back(std::make_pair(warningLedPath, true));
+                ledsToSet.push_back(std::make_pair(okLedPath, false));
+                break;
+            }
+            case (StatusSetting::ok):
+            {
+                ledsToSet.push_back(std::make_pair(fatalLedPath, false));
+                ledsToSet.push_back(std::make_pair(criticalLedPath, false));
+                ledsToSet.push_back(std::make_pair(warningLedPath, false));
+                ledsToSet.push_back(std::make_pair(okLedPath, true));
+                break;
+            }
+        }
     }
 
     for (const auto& ledPair : ledsToSet)
@@ -174,7 +223,8 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
     match = std::make_unique<sdbusplus::bus::match::match>(
         static_cast<sdbusplus::bus::bus&>(*conn),
-        "type='signal',interface='org.freedesktop.DBus.Properties',path_"
+        "type='signal',interface='org.freedesktop.DBus.Properties',"
+        "path_"
         "namespace='/xyz/openbmc_project/"
         "sensors',arg0namespace='xyz.openbmc_project.Sensor.Threshold'",
         thresholdCallback);
@@ -195,6 +245,7 @@ int main(int argc, char** argv)
     assertedIface->initialize();
 
     createThresholdMatch(conn);
+    updateLedStatus(conn);
 
     io.run();
 

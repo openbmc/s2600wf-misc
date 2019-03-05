@@ -1,6 +1,7 @@
 [Unit]
 Description=Callback Manager
 StopWhenUnneeded=false
+After=xyz.openbmc_project.LED.GroupManager.service
 
 [Service]
 Type=dbus
