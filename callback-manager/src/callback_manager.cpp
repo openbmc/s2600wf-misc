@@ -79,7 +79,8 @@ std::vector<std::string> assertedInMap(
     return ret;
 }
 
-void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn)
+void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
+                     bool forceRefresh = false)
 {
     std::vector<std::string> assertedVector = assertedInMap(fatalAssertMap);
     assertedIface->set_property("Fatal", assertedVector);
@@ -115,7 +116,7 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
     std::vector<std::pair<std::string, std::variant<bool>>> ledsToSet;
 
-    if (last != currentPriority)
+    if (last != currentPriority || forceRefresh)
     {
         switch (currentPriority)
         {
@@ -242,6 +243,8 @@ int main(int argc, char** argv)
     assertedIface->register_property("Warning", std::vector<std::string>());
     assertedIface->register_property("Critical", std::vector<std::string>());
     assertedIface->register_property("Fatal", std::vector<std::string>());
+    assertedIface->register_method("RetriggerLEDUpdate",
+                                   [&conn]() { updateLedStatus(conn, true); });
     assertedIface->initialize();
 
     createThresholdMatch(conn);
