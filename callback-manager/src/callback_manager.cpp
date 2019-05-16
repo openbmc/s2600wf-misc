@@ -14,8 +14,9 @@
 // limitations under the License.
 */
 
+#include "callback_manager.hpp"
+
 #include <boost/container/flat_map.hpp>
-#include <iostream>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
 #include <variant>
@@ -33,6 +34,8 @@ constexpr const char* ledAssertProp = "Asserted";
 constexpr const char* ledManagerBusname =
     "xyz.openbmc_project.LED.GroupManager";
 
+std::unique_ptr<AssociationManager> associationManager;
+
 enum class StatusSetting
 {
     none,
@@ -41,8 +44,6 @@ enum class StatusSetting
     critical,
     fatal
 };
-
-std::shared_ptr<sdbusplus::asio::dbus_interface> assertedIface = nullptr;
 
 constexpr const bool debug = false;
 
@@ -82,18 +83,17 @@ std::vector<std::string> assertedInMap(
 void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
                      bool forceRefresh = false)
 {
-    std::vector<std::string> assertedVector = assertedInMap(fatalAssertMap);
-    assertedIface->set_property("Fatal", assertedVector);
-    bool fatal = assertedVector.size();
+    std::vector<std::string> fatalVector = assertedInMap(fatalAssertMap);
+    bool fatal = fatalVector.size();
 
-    assertedVector = assertedInMap(criticalAssertMap);
-    assertedIface->set_property("Critical", assertedVector);
-    bool critical = assertedVector.size();
+    std::vector<std::string> criticalVector = assertedInMap(criticalAssertMap);
+    bool critical = criticalVector.size();
 
-    assertedVector = assertedInMap(warningAssertMap);
-    assertedIface->set_property("Warning", assertedVector);
+    std::vector<std::string> warningVector = assertedInMap(warningAssertMap);
+    bool warn = warningVector.size();
 
-    bool warn = assertedVector.size();
+    associationManager->setLocalAssociations(fatalVector, criticalVector,
+                                             warningVector);
 
     StatusSetting last = currentPriority;
 
@@ -237,15 +237,18 @@ int main(int argc, char** argv)
     auto conn = std::make_shared<sdbusplus::asio::connection>(io);
     conn->request_name("xyz.openbmc_project.CallbackManager");
     sdbusplus::asio::object_server objServer(conn);
-    assertedIface =
-        objServer.add_interface("/xyz/openbmc_project/CallbackManager",
+    std::shared_ptr<sdbusplus::asio::dbus_interface> rootIface =
+        objServer.add_interface(rootPath,
                                 "xyz.openbmc_project.CallbackManager");
-    assertedIface->register_property("Warning", std::vector<std::string>());
-    assertedIface->register_property("Critical", std::vector<std::string>());
-    assertedIface->register_property("Fatal", std::vector<std::string>());
-    assertedIface->register_method("RetriggerLEDUpdate",
-                                   [&conn]() { updateLedStatus(conn, true); });
-    assertedIface->initialize();
+    rootIface->register_method("RetriggerLEDUpdate",
+                               [&conn]() { updateLedStatus(conn, true); });
+    rootIface->initialize();
+
+    std::shared_ptr<sdbusplus::asio::dbus_interface> inventoryIface =
+        objServer.add_interface(rootPath, globalInventoryIface);
+    inventoryIface->initialize();
+
+    associationManager = std::make_unique<AssociationManager>(objServer, conn);
 
     createThresholdMatch(conn);
     updateLedStatus(conn);
