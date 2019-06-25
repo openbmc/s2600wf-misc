@@ -61,7 +61,6 @@ struct AssociationManager
         {
             result.emplace(threshold::warning, "", path);
         }
-        setSensorAssociations(critical, warning);
         association->set_property("associations", result);
     }
 
