@@ -179,14 +179,25 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
 
 void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 {
-    static std::unique_ptr<sdbusplus::bus::match::match> match = nullptr;
 
-    std::function<void(sdbusplus::message::message&)> thresholdCallback =
+    static sdbusplus::bus::match::match match(
+        static_cast<sdbusplus::bus::bus&>(*conn),
+        "type='signal',interface='org.freedesktop.DBus.Properties',"
+        "path_"
+        "namespace='/xyz/openbmc_project/"
+        "sensors',arg0namespace='xyz.openbmc_project.Sensor.Threshold'",
         [&conn](sdbusplus::message::message& message) {
             std::string objectName;
             boost::container::flat_map<std::string, std::variant<bool>> values;
-            message.read(objectName, values);
 
+            try
+            {
+                message.read(objectName, values);
+            }
+            catch (sdbusplus::exception_t&)
+            {
+                return;
+            }
             if constexpr (debug)
             {
                 std::cerr << "Threshold callback " << message.get_path()
@@ -219,16 +230,102 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
                 warningAssertMap[message.get_path()]["High"] =
                     std::get<bool>(findWarnHigh->second);
             }
-            updateLedStatus(conn);
-        };
 
-    match = std::make_unique<sdbusplus::bus::match::match>(
+            associationManager->setSensorAssociations(
+                assertedInMap(criticalAssertMap),
+                assertedInMap(warningAssertMap));
+
+            updateLedStatus(conn);
+        });
+}
+
+void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
+{
+    static sdbusplus::bus::match::match match(
         static_cast<sdbusplus::bus::bus&>(*conn),
         "type='signal',interface='org.freedesktop.DBus.Properties',"
-        "path_"
-        "namespace='/xyz/openbmc_project/"
-        "sensors',arg0namespace='xyz.openbmc_project.Sensor.Threshold'",
-        thresholdCallback);
+        "arg0namespace='" +
+            std::string(associationIface) + "'",
+        [&conn](sdbusplus::message::message& message) {
+            if (message.get_path() == rootPath)
+            {
+                return; // it's us
+            }
+            std::string objectName;
+            boost::container::flat_map<std::string,
+                                       std::variant<std::vector<Association>>>
+                values;
+            try
+            {
+                message.read(objectName, values);
+            }
+            catch (sdbusplus::exception_t&)
+            {
+                return;
+            }
+
+            if constexpr (debug)
+            {
+                std::cerr << "Association callback " << message.get_path()
+                          << "\n";
+            }
+
+            auto findAssociations = values.find("associations");
+            if (findAssociations == values.end())
+            {
+                return;
+            }
+            const std::vector<Association>* associations =
+                std::get_if<std::vector<Association>>(
+                    &findAssociations->second);
+
+            if (associations == nullptr)
+            {
+                std::cerr << "Illegal Association on " << message.get_path()
+                          << "\n";
+                return;
+            }
+
+            bool localWarning = false;
+            bool localCritical = false;
+            bool globalWarning = false;
+            bool globalCritical = false;
+
+            for (const auto& [forward, reverse, path] : *associations)
+            {
+                if (path == rootPath)
+                {
+                    globalWarning = globalWarning ? true : reverse == "warning";
+                    globalCritical =
+                        globalCritical ? true : reverse == "critical";
+
+                    if constexpr (1)
+                    {
+                        std::cerr << "got global ";
+                    }
+                }
+                else
+                {
+                    localWarning = localWarning ? true : reverse == "warning";
+                    localCritical =
+                        localCritical ? true : reverse == "critical";
+                }
+                if (globalCritical && localCritical)
+                {
+                    break;
+                }
+            }
+
+            bool fatal = globalCritical && localCritical;
+            bool critical = globalWarning && localCritical;
+            bool warning = globalWarning && localWarning;
+
+            fatalAssertMap[message.get_path()]["association"] = fatal;
+            criticalAssertMap[message.get_path()]["association"] = critical;
+            warningAssertMap[message.get_path()]["association"] = warning;
+
+            updateLedStatus(conn);
+        });
 }
 
 int main(int argc, char** argv)
@@ -251,6 +348,7 @@ int main(int argc, char** argv)
     associationManager = std::make_unique<AssociationManager>(objServer, conn);
 
     createThresholdMatch(conn);
+    createAssociationMatch(conn);
     updateLedStatus(conn);
 
     io.run();
