@@ -1,0 +1,12 @@
+[Unit]
+Description=HSBP Manager
+
+[Service]
+Type=dbus
+BusName=xyz.openbmc_project.HsbpManager
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/hsbp-manager
+
+[Install]
+WantedBy=multi-user.target
