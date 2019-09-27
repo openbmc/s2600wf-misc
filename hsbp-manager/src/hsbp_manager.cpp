@@ -49,7 +49,8 @@ static std::string zeroPad(const uint8_t val)
 
 struct Drive
 {
-    Drive(size_t driveIndex, bool isPresent, bool isOperational, bool nvme) :
+    Drive(size_t driveIndex, bool isPresent, bool isOperational, bool nvme,
+          bool rebuilding) :
         isNvme(nvme)
     {
         constexpr const char* basePath =
@@ -61,19 +62,25 @@ struct Drive
                                      "Drive " + std::to_string(driveIndex));
         itemIface->initialize();
         operationalIface = objServer.add_interface(
-            basePath + std::to_string(driveIndex),
+            itemIface->get_object_path(),
             "xyz.openbmc_project.State.Decorator.OperationalStatus");
         operationalIface->register_property("Functional", isOperational);
         operationalIface->initialize();
+        rebuildingIface = objServer.add_interface(
+            itemIface->get_object_path(), "xyz.openbmc_project.State.Drive");
+        rebuildingIface->register_property("Rebuilding", rebuilding);
+        rebuildingIface->initialize();
     }
     ~Drive()
     {
         objServer.remove_interface(itemIface);
         objServer.remove_interface(operationalIface);
+        objServer.remove_interface(rebuildingIface);
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> operationalIface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> rebuildingIface;
     bool isNvme;
 };
 
@@ -155,17 +162,20 @@ struct Backplane
             uint8_t curPresence = 0;
             uint8_t curIFDET = 0;
             uint8_t curFailed = 0;
+            uint8_t curRebuild = 0;
 
             getPresence(curPresence);
             getIFDET(curIFDET);
             getFailed(curFailed);
+            getRebuild(curRebuild);
 
             if (curPresence != presence || curIFDET != ifdet ||
-                curFailed != failed)
+                curFailed != failed || curRebuild != rebuilding)
             {
                 presence = curPresence;
                 ifdet = curIFDET;
                 failed = curFailed;
+                rebuilding = curRebuild;
                 updateDrives();
             }
             runTimer();
@@ -180,10 +190,12 @@ struct Backplane
             bool isNvme = nvme & (1 << ii);
             bool isPresent = isNvme || (presence & (1 << ii));
             bool isFailed = !isPresent || failed & (1 << ii);
+            bool isRebuilding = !isPresent && (rebuilding & (1 << ii));
 
             // +1 to convert from 0 based to 1 based
             size_t driveIndex = (backplaneIndex * maxDrives) + ii + 1;
-            drives.emplace_back(driveIndex, isPresent, !isFailed, isNvme);
+            drives.emplace_back(driveIndex, isPresent, !isFailed, isNvme,
+                                isRebuilding);
         }
     }
 
@@ -195,12 +207,14 @@ struct Backplane
         {
             bool isNvme = nvme & (1 << ii);
             bool isPresent = isNvme || (presence & (1 << ii));
-            bool isFailed = !isPresent || failed & (1 << ii);
+            bool isFailed = !isPresent || (failed & (1 << ii));
+            bool isRebuilding = isPresent && (rebuilding & (1 << ii));
 
             Drive& drive = drives[ii];
             drive.isNvme = isNvme;
             drive.itemIface->set_property("Present", isPresent);
             drive.operationalIface->set_property("Functional", !isFailed);
+            drive.rebuildingIface->set_property("Rebuilding", isRebuilding);
         }
     }
 
@@ -351,6 +365,7 @@ struct Backplane
     uint8_t presence = 0;
     uint8_t ifdet = 0;
     uint8_t failed = 0;
+    uint8_t rebuilding = 0;
 
     int file = -1;
 
