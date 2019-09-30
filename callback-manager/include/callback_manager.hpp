@@ -12,7 +12,8 @@ constexpr const char* sensorPath = "/xyz/openbmc_project/sensors";
 
 constexpr const char* globalInventoryIface =
     "xyz.openbmc_project.Inventory.Item.Global";
-constexpr const char* associationIface = "org.openbmc.Associations";
+constexpr const char* associationIface =
+    "xyz.openbmc_project.Association.Definitions";
 
 namespace threshold
 {
@@ -29,8 +30,8 @@ struct AssociationManager
         sensorAssociation(
             objectServer.add_interface(sensorPath, associationIface))
     {
-        association->register_property("associations", std::set<Association>());
-        sensorAssociation->register_property("associations",
+        association->register_property("Associations", std::set<Association>());
+        sensorAssociation->register_property("Associations",
                                              std::set<Association>());
         association->initialize();
         sensorAssociation->initialize();
@@ -61,7 +62,7 @@ struct AssociationManager
         {
             result.emplace(threshold::warning, "", path);
         }
-        association->set_property("associations", result);
+        association->set_property("Associations", result);
     }
 
     void setSensorAssociations(const std::vector<std::string>& critical,
@@ -84,7 +85,7 @@ struct AssociationManager
             }
             result.emplace(threshold::warning, "", path);
         }
-        sensorAssociation->set_property("associations", result);
+        sensorAssociation->set_property("Associations", result);
     }
 
     sdbusplus::asio::object_server& objectServer;
