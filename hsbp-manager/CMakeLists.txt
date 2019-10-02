@@ -87,6 +87,7 @@ target_link_libraries (hsbp-manager -lsystemd)
 target_link_libraries (hsbp-manager i2c)
 target_link_libraries (hsbp-manager ${Boost_LIBRARIES})
 target_link_libraries (hsbp-manager sdbusplus)
+target_link_libraries (hsbp-manager stdc++fs)
 
 if (NOT YOCTO)
     add_dependencies (hsbp-manager sdbusplus-project)
