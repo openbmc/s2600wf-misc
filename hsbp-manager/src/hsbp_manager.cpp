@@ -18,6 +18,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <filesystem>
 #include <iostream>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
@@ -47,6 +48,14 @@ static std::string zeroPad(const uint8_t val)
     return version.str();
 }
 
+struct Mux
+{
+    Mux(size_t busIn, size_t addressIn) : bus(busIn), address(addressIn)
+    {
+    }
+    size_t bus;
+    size_t address;
+};
 struct Drive
 {
     Drive(size_t driveIndex, bool isPresent, bool isOperational, bool nvme,
@@ -76,11 +85,28 @@ struct Drive
         objServer.remove_interface(itemIface);
         objServer.remove_interface(operationalIface);
         objServer.remove_interface(rebuildingIface);
+        objServer.remove_interface(associationIface);
+    }
+
+    void createAssociation(const std::string& path)
+    {
+        if (associationIface != nullptr)
+        {
+            return;
+        }
+        associationIface = objServer.add_interface(
+            itemIface->get_object_path(),
+            "xyz.openbmc_project.Association.Definitions");
+        std::vector<Association> associations;
+        associations.emplace_back("inventory", "drive", path);
+        associationIface->register_property("Associations", associations);
+        associationIface->initialize();
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> operationalIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> rebuildingIface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> associationIface;
     bool isNvme;
 };
 
@@ -91,7 +117,8 @@ struct Backplane
               const std::string& nameIn) :
         bus(busIn),
         address(addressIn), backplaneIndex(backplaneIndexIn - 1), name(nameIn),
-        timer(std::make_shared<boost::asio::steady_timer>(io))
+        timer(std::make_shared<boost::asio::steady_timer>(io)),
+        muxes(std::make_shared<std::vector<Mux>>())
     {
     }
     void run()
@@ -375,9 +402,205 @@ struct Backplane
     std::shared_ptr<sdbusplus::asio::dbus_interface> versionIface;
 
     std::vector<Drive> drives;
+    std::shared_ptr<std::vector<Mux>> muxes;
 };
 
 std::unordered_map<std::string, Backplane> backplanes;
+
+void updateAssociations()
+{
+    constexpr const char* driveType =
+        "xyz.openbmc_project.Inventory.Item.Drive";
+
+    conn->async_method_call(
+        [](const boost::system::error_code ec, const GetSubTreeType& subtree) {
+            if (ec)
+            {
+                std::cerr << "Error contacting mapper " << ec.message() << "\n";
+                return;
+            }
+            for (const auto& [path, objDict] : subtree)
+            {
+                if (objDict.empty())
+                {
+                    continue;
+                }
+
+                const std::string& owner = objDict.begin()->first;
+                conn->async_method_call(
+                    [path](const boost::system::error_code ec2,
+                           const boost::container::flat_map<
+                               std::string, std::variant<uint64_t>>& values) {
+                        if (ec2)
+                        {
+                            std::cerr << "Error Getting Config "
+                                      << ec2.message() << " " << __FUNCTION__
+                                      << "\n";
+                            return;
+                        }
+                        auto findBus = values.find("Bus");
+                        auto findIndex = values.find("Index");
+
+                        if (findBus == values.end() ||
+                            findIndex == values.end())
+                        {
+                            std::cerr << "Illegal interface at " << path
+                                      << "\n";
+                            return;
+                        }
+
+                        size_t muxBus = static_cast<size_t>(
+                            std::get<uint64_t>(findBus->second));
+                        size_t driveIndex = static_cast<size_t>(
+                            std::get<uint64_t>(findIndex->second));
+                        std::filesystem::path muxPath =
+                            "/sys/bus/i2c/devices/i2c-" +
+                            std::to_string(muxBus) + "/mux_device";
+                        if (!std::filesystem::is_symlink(muxPath))
+                        {
+                            std::cerr << path << " mux does not exist\n";
+                            return;
+                        }
+
+                        // we should be getting something of the form 7-0052 for
+                        // bus 7 addr 52
+                        std::string fname =
+                            std::filesystem::read_symlink(muxPath).filename();
+                        auto findDash = fname.find('-');
+
+                        if (findDash == std::string::npos ||
+                            findDash + 1 >= fname.size())
+                        {
+                            std::cerr << path << " mux path invalid\n";
+                            return;
+                        }
+
+                        std::string busStr = fname.substr(0, findDash);
+                        std::string muxStr = fname.substr(findDash + 1);
+
+                        size_t bus = static_cast<size_t>(std::stoi(busStr));
+                        size_t addr =
+                            static_cast<size_t>(std::stoi(muxStr, nullptr, 16));
+                        Backplane* parent = nullptr;
+                        for (auto& [name, backplane] : backplanes)
+                        {
+                            for (const Mux& mux : *(backplane.muxes))
+                            {
+                                if (bus == mux.bus && addr == mux.address)
+                                {
+                                    parent = &backplane;
+                                    break;
+                                }
+                            }
+                        }
+                        if (parent == nullptr)
+                        {
+                            std::cerr << "Failed to find mux at bus " << bus
+                                      << ", addr " << addr << "\n";
+                            return;
+                        }
+                        if (parent->drives.size() <= driveIndex)
+                        {
+
+                            std::cerr << "Illegal drive index at " << path
+                                      << " " << driveIndex << "\n";
+                            return;
+                        }
+                        Drive& drive = parent->drives[driveIndex];
+                        drive.createAssociation(path);
+                    },
+                    owner, path, "org.freedesktop.DBus.Properties", "GetAll",
+                    "xyz.openbmc_project.Inventory.Item.Drive");
+            }
+        },
+        mapper::busName, mapper::path, mapper::interface, mapper::subtree, "/",
+        0, std::array<const char*, 1>{driveType});
+}
+
+void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
+                   std::string& rootPath)
+{
+    const static std::array<const std::string, 4> muxTypes = {
+        "xyz.openbmc_project.Configuration.PCA9543Mux",
+        "xyz.openbmc_project.Configuration.PCA9544Mux",
+        "xyz.openbmc_project.Configuration.PCA9545Mux",
+        "xyz.openbmc_project.Configuration.PCA9546Mux"};
+    conn->async_method_call(
+        [muxes](const boost::system::error_code ec,
+                const GetSubTreeType& subtree) {
+            if (ec)
+            {
+                std::cerr << "Error contacting mapper " << ec.message() << "\n";
+                return;
+            }
+            std::shared_ptr<std::function<void()>> callback =
+                std::make_shared<std::function<void()>>(
+                    []() { updateAssociations(); });
+            for (const auto& [path, objDict] : subtree)
+            {
+                if (objDict.empty() || objDict.begin()->second.empty())
+                {
+                    continue;
+                }
+
+                const std::string& owner = objDict.begin()->first;
+                const std::vector<std::string>& interfaces =
+                    objDict.begin()->second;
+
+                const std::string* interface = nullptr;
+                for (const std::string& iface : interfaces)
+                {
+                    if (std::find(muxTypes.begin(), muxTypes.end(), iface) !=
+                        muxTypes.end())
+                    {
+                        interface = &iface;
+                        break;
+                    }
+                }
+                if (interface == nullptr)
+                {
+                    std::cerr << "Cannot get mux type\n";
+                    continue;
+                }
+
+                conn->async_method_call(
+                    [path, muxes, callback](
+                        const boost::system::error_code ec2,
+                        const boost::container::flat_map<
+                            std::string, std::variant<uint64_t>>& values) {
+                        if (ec2)
+                        {
+                            std::cerr << "Error Getting Config "
+                                      << ec2.message() << " " << __FUNCTION__
+                                      << "\n";
+                            return;
+                        }
+                        auto findBus = values.find("Bus");
+                        auto findAddress = values.find("Address");
+                        if (findBus == values.end() ||
+                            findAddress == values.end())
+                        {
+                            std::cerr << "Illegal configuration at " << path
+                                      << "\n";
+                            return;
+                        }
+                        size_t bus = static_cast<size_t>(
+                            std::get<uint64_t>(findBus->second));
+                        size_t address = static_cast<size_t>(
+                            std::get<uint64_t>(findAddress->second));
+                        muxes->emplace_back(bus, address);
+                        if (callback.use_count() == 1)
+                        {
+                            (*callback)();
+                        }
+                    },
+                    owner, path, "org.freedesktop.DBus.Properties", "GetAll",
+                    *interface);
+            }
+        },
+        mapper::busName, mapper::path, mapper::interface, mapper::subtree,
+        rootPath, 1, muxTypes);
+}
 
 void populate()
 {
@@ -436,10 +659,13 @@ void populate()
                                       << "\n";
                             return;
                         }
+                        std::string parentPath =
+                            std::filesystem::path(path).parent_path();
                         const auto& [backplane, status] = backplanes.emplace(
                             *name,
                             Backplane(*bus, *address, *backplaneIndex, *name));
                         backplane->second.run();
+                        populateMuxes(backplane->second.muxes, parentPath);
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     configType);
@@ -459,6 +685,27 @@ int main()
         *conn,
         "type='signal',member='PropertiesChanged',arg0='" +
             std::string(configType) + "'",
+        [&callbackTimer](sdbusplus::message::message&) {
+            callbackTimer.expires_after(std::chrono::seconds(2));
+            callbackTimer.async_wait([](const boost::system::error_code ec) {
+                if (ec == boost::asio::error::operation_aborted)
+                {
+                    // timer was restarted
+                    return;
+                }
+                else if (ec)
+                {
+                    std::cerr << "Timer error" << ec.message() << "\n";
+                    return;
+                }
+                populate();
+            });
+        });
+
+    sdbusplus::bus::match::match drive(
+        *conn,
+        "type='signal',member='PropertiesChanged',arg0='xyz.openbmc_project."
+        "Inventory.Item.Drive'",
         [&callbackTimer](sdbusplus::message::message&) {
             callbackTimer.expires_after(std::chrono::seconds(2));
             callbackTimer.async_wait([](const boost::system::error_code ec) {

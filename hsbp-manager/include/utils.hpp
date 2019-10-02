@@ -25,6 +25,7 @@ using GetSubTreeType = std::vector<
 using BasicVariantType =
     std::variant<std::vector<std::string>, std::string, int64_t, uint64_t,
                  double, int32_t, uint32_t, int16_t, uint16_t, uint8_t, bool>;
+using Association = std::tuple<std::string, std::string, std::string>;
 
 namespace mapper
 {
