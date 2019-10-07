@@ -33,6 +33,7 @@ extern "C" {
 
 constexpr const char* configType =
     "xyz.openbmc_project.Configuration.Intel_HSBP_CPLD";
+constexpr const char* busName = "xyz.openbmc_project.HsbpManager";
 
 constexpr size_t scanRateSeconds = 5;
 constexpr size_t maxDrives = 8; // only 1 byte alloted
@@ -86,6 +87,7 @@ struct Drive
         objServer.remove_interface(operationalIface);
         objServer.remove_interface(rebuildingIface);
         objServer.remove_interface(associationIface);
+        objServer.remove_interface(driveIface);
     }
 
     void createAssociation(const std::string& path)
@@ -103,10 +105,35 @@ struct Drive
         associationIface->initialize();
     }
 
+    void removeDriveIface()
+    {
+        objServer.remove_interface(driveIface);
+    }
+
+    void createDriveIface()
+    {
+        if (associationIface != nullptr || driveIface != nullptr)
+        {
+            // this shouldn't be used if we found another provider of the drive
+            // interface, or if we already created one
+            return;
+        }
+        driveIface =
+            objServer.add_interface(itemIface->get_object_path(),
+                                    "xyz.openbmc_project.Inventory.Item.Drive");
+        driveIface->initialize();
+        createAssociation(itemIface->get_object_path());
+    }
+
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> operationalIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> rebuildingIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> associationIface;
+
+    // if something else doesn't expose a driveInterface for this, we need to
+    // export it ourselves
+    std::shared_ptr<sdbusplus::asio::dbus_interface> driveIface;
+
     bool isNvme;
 };
 
@@ -407,6 +434,21 @@ struct Backplane
 
 std::unordered_map<std::string, Backplane> backplanes;
 
+void createDriveInterfaces(size_t referenceCount)
+{
+    if (referenceCount != 1)
+    {
+        return;
+    }
+    for (auto& [name, backplane] : backplanes)
+    {
+        for (Drive& drive : backplane.drives)
+        {
+            drive.createDriveIface();
+        }
+    }
+}
+
 void updateAssociations()
 {
     constexpr const char* driveType =
@@ -427,15 +469,23 @@ void updateAssociations()
                 }
 
                 const std::string& owner = objDict.begin()->first;
+                // we export this interface too
+                if (owner == busName)
+                {
+                    continue;
+                }
+                std::shared_ptr<bool> referenceCount = std::make_shared<bool>();
                 conn->async_method_call(
-                    [path](const boost::system::error_code ec2,
-                           const boost::container::flat_map<
-                               std::string, std::variant<uint64_t>>& values) {
+                    [path, referenceCount](
+                        const boost::system::error_code ec2,
+                        const boost::container::flat_map<
+                            std::string, std::variant<uint64_t>>& values) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
                                       << ec2.message() << " " << __FUNCTION__
                                       << "\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
                         auto findBus = values.find("Bus");
@@ -446,6 +496,7 @@ void updateAssociations()
                         {
                             std::cerr << "Illegal interface at " << path
                                       << "\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
@@ -459,6 +510,7 @@ void updateAssociations()
                         if (!std::filesystem::is_symlink(muxPath))
                         {
                             std::cerr << path << " mux does not exist\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
@@ -472,6 +524,7 @@ void updateAssociations()
                             findDash + 1 >= fname.size())
                         {
                             std::cerr << path << " mux path invalid\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
@@ -497,6 +550,7 @@ void updateAssociations()
                         {
                             std::cerr << "Failed to find mux at bus " << bus
                                       << ", addr " << addr << "\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
                         if (parent->drives.size() <= driveIndex)
@@ -504,10 +558,13 @@ void updateAssociations()
 
                             std::cerr << "Illegal drive index at " << path
                                       << " " << driveIndex << "\n";
+                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
                         Drive& drive = parent->drives[driveIndex];
+                        drive.removeDriveIface();
                         drive.createAssociation(path);
+                        createDriveInterfaces(referenceCount.use_count());
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     "xyz.openbmc_project.Inventory.Item.Drive");
@@ -679,7 +736,7 @@ int main()
 {
     boost::asio::steady_timer callbackTimer(io);
 
-    conn->request_name("xyz.openbmc_project.HsbpManager");
+    conn->request_name(busName);
 
     sdbusplus::bus::match::match match(
         *conn,
@@ -706,8 +763,12 @@ int main()
         *conn,
         "type='signal',member='PropertiesChanged',arg0='xyz.openbmc_project."
         "Inventory.Item.Drive'",
-        [&callbackTimer](sdbusplus::message::message&) {
+        [&callbackTimer](sdbusplus::message::message& message) {
             callbackTimer.expires_after(std::chrono::seconds(2));
+            if (message.get_sender() == conn->get_unique_name())
+            {
+                return;
+            }
             callbackTimer.async_wait([](const boost::system::error_code ec) {
                 if (ec == boost::asio::error::operation_aborted)
                 {
