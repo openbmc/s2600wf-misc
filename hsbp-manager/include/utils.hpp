@@ -45,6 +45,12 @@ namespace inventory
 constexpr const char* interface = "xyz.openbmc_project.Inventory.Item";
 } // namespace inventory
 
+namespace ledGroup
+{
+constexpr const char* interface = "xyz.openbmc_project.Led.Group";
+constexpr const char* asserted = "Asserted";
+} // namespace ledGroup
+
 namespace hsbp
 {
 enum class registers : uint8_t

@@ -57,6 +57,73 @@ struct Mux
     size_t bus;
     size_t address;
 };
+
+enum class BlinkPattern : uint8_t
+{
+    off = 0x0,
+    error = 0x2,
+    terminate = 0x3
+};
+
+struct Led : std::enable_shared_from_this<Led>
+{
+    // led pattern addresses start at 0x10
+    Led(const std::string& path, size_t index, int fd) :
+        address(static_cast<uint8_t>(index + 0x10)), file(fd),
+        ledInterface(objServer.add_interface(path, ledGroup::interface))
+    {
+        if (index >= maxDrives)
+        {
+            throw std::runtime_error("Invalid drive index");
+        }
+
+        if (!set(BlinkPattern::off))
+        {
+            std::cerr << "Cannot initialize LED " << path << "\n";
+        }
+    }
+
+    // this has to be called outside the constructor for shared_from_this to
+    // work
+    void createInterface(void)
+    {
+        std::shared_ptr<Led> self = shared_from_this();
+
+        ledInterface->register_property(
+            ledGroup::asserted, false, [self](const bool req, bool& val) {
+                if (req == val)
+                {
+                    return 1;
+                }
+                BlinkPattern pattern =
+                    req ? BlinkPattern::error : BlinkPattern::terminate;
+                if (!self->set(pattern))
+                {
+                    throw std::runtime_error("Cannot set blink pattern");
+                }
+                val = req;
+                return 1;
+            });
+        ledInterface->initialize();
+    }
+
+    virtual ~Led()
+    {
+        objServer.remove_interface(ledInterface);
+    }
+
+    bool set(BlinkPattern pattern)
+    {
+        int ret = i2c_smbus_write_byte_data(file, address,
+                                            static_cast<uint8_t>(pattern));
+        return ret >= 0;
+    }
+
+    uint8_t address;
+    int file;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> ledInterface;
+};
+
 struct Drive
 {
     Drive(size_t driveIndex, bool isPresent, bool isOperational, bool nvme,
@@ -81,7 +148,7 @@ struct Drive
         rebuildingIface->register_property("Rebuilding", rebuilding);
         rebuildingIface->initialize();
     }
-    ~Drive()
+    virtual ~Drive()
     {
         objServer.remove_interface(itemIface);
         objServer.remove_interface(operationalIface);
@@ -150,7 +217,8 @@ struct Backplane
     }
     void run()
     {
-        file = open(("/dev/i2c-" + std::to_string(bus)).c_str(), O_RDWR);
+        file = open(("/dev/i2c-" + std::to_string(bus)).c_str(),
+                    O_RDWR | O_CLOEXEC);
         if (file < 0)
         {
             std::cerr << "unable to open bus " << bus << "\n";
@@ -248,8 +316,11 @@ struct Backplane
 
             // +1 to convert from 0 based to 1 based
             size_t driveIndex = (backplaneIndex * maxDrives) + ii + 1;
-            drives.emplace_back(driveIndex, isPresent, !isFailed, isNvme,
-                                isRebuilding);
+            Drive& drive = drives.emplace_back(driveIndex, isPresent, !isFailed,
+                                               isNvme, isRebuilding);
+            std::shared_ptr<Led> led = leds.emplace_back(std::make_shared<Led>(
+                drive.itemIface->get_object_path(), ii, file));
+            led->createInterface();
         }
     }
 
@@ -395,7 +466,7 @@ struct Backplane
         return true;
     }
 
-    ~Backplane()
+    virtual ~Backplane()
     {
         objServer.remove_interface(hsbpItemIface);
         objServer.remove_interface(versionIface);
@@ -429,6 +500,7 @@ struct Backplane
     std::shared_ptr<sdbusplus::asio::dbus_interface> versionIface;
 
     std::vector<Drive> drives;
+    std::vector<std::shared_ptr<Led>> leds;
     std::shared_ptr<std::vector<Mux>> muxes;
 };
 
