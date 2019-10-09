@@ -95,10 +95,18 @@ struct Led : std::enable_shared_from_this<Led>
                 {
                     return 1;
                 }
+
+                if (!isPowerOn())
+                {
+                    std::cerr << "Can't change blink state when power is off\n";
+                    throw std::runtime_error(
+                        "Can't change blink state when power is off");
+                }
                 BlinkPattern pattern =
                     req ? BlinkPattern::error : BlinkPattern::terminate;
                 if (!self->set(pattern))
                 {
+                    std::cerr << "Can't change blink pattern\n";
                     throw std::runtime_error("Cannot set blink pattern");
                 }
                 val = req;
@@ -279,6 +287,13 @@ struct Backplane
             else if (ec)
             {
                 std::cerr << "timer error " << ec.message() << "\n";
+                return;
+            }
+
+            if (!isPowerOn())
+            {
+                // can't access hsbp when power is off
+                runTimer();
                 return;
             }
             uint8_t curPresence = 0;
@@ -857,5 +872,6 @@ int main()
         });
 
     io.post([]() { populate(); });
+    setupPowerMatch(conn);
     io.run();
 }
