@@ -18,7 +18,9 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/container/flat_set.hpp>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
@@ -51,11 +53,20 @@ static std::string zeroPad(const uint8_t val)
 
 struct Mux
 {
-    Mux(size_t busIn, size_t addressIn) : bus(busIn), address(addressIn)
+    Mux(size_t busIn, size_t addressIn, size_t channelsIn, size_t indexIn) :
+        bus(busIn), address(addressIn), channels(channelsIn), index(indexIn)
     {
     }
     size_t bus;
     size_t address;
+    size_t channels;
+    size_t index;
+
+    // to sort in the flat set
+    bool operator<(const Mux& rhs) const
+    {
+        return index < rhs.index;
+    }
 };
 
 enum class BlinkPattern : uint8_t
@@ -155,58 +166,41 @@ struct Drive
             itemIface->get_object_path(), "xyz.openbmc_project.State.Drive");
         rebuildingIface->register_property("Rebuilding", rebuilding);
         rebuildingIface->initialize();
+        driveIface =
+            objServer.add_interface(itemIface->get_object_path(),
+                                    "xyz.openbmc_project.Inventory.Item.Drive");
+        driveIface->initialize();
     }
     virtual ~Drive()
     {
         objServer.remove_interface(itemIface);
         objServer.remove_interface(operationalIface);
         objServer.remove_interface(rebuildingIface);
-        objServer.remove_interface(associationIface);
+        objServer.remove_interface(assetIface);
         objServer.remove_interface(driveIface);
     }
 
-    void createAssociation(const std::string& path)
+    void createAsset(
+        const boost::container::flat_map<std::string, std::string>& data)
     {
-        if (associationIface != nullptr)
+        if (assetIface != nullptr)
         {
             return;
         }
-        associationIface = objServer.add_interface(
+        assetIface = objServer.add_interface(
             itemIface->get_object_path(),
-            "xyz.openbmc_project.Association.Definitions");
-        std::vector<Association> associations;
-        associations.emplace_back("inventory", "drive", path);
-        associationIface->register_property("Associations", associations);
-        associationIface->initialize();
-    }
-
-    void removeDriveIface()
-    {
-        objServer.remove_interface(driveIface);
-    }
-
-    void createDriveIface()
-    {
-        if (associationIface != nullptr || driveIface != nullptr)
+            "xyz.openbmc_project.Inventory.Decorator.Asset");
+        for (const auto& [key, value] : data)
         {
-            // this shouldn't be used if we found another provider of the drive
-            // interface, or if we already created one
-            return;
+            assetIface->register_property(key, value);
         }
-        driveIface =
-            objServer.add_interface(itemIface->get_object_path(),
-                                    "xyz.openbmc_project.Inventory.Item.Drive");
-        driveIface->initialize();
-        createAssociation(itemIface->get_object_path());
+        assetIface->initialize();
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> operationalIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> rebuildingIface;
-    std::shared_ptr<sdbusplus::asio::dbus_interface> associationIface;
-
-    // if something else doesn't expose a driveInterface for this, we need to
-    // export it ourselves
+    std::shared_ptr<sdbusplus::asio::dbus_interface> assetIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> driveIface;
 
     bool isNvme;
@@ -220,7 +214,7 @@ struct Backplane
         bus(busIn),
         address(addressIn), backplaneIndex(backplaneIndexIn - 1), name(nameIn),
         timer(std::make_shared<boost::asio::steady_timer>(io)),
-        muxes(std::make_shared<std::vector<Mux>>())
+        muxes(std::make_shared<boost::container::flat_set<Mux>>())
     {
     }
     void run()
@@ -516,30 +510,28 @@ struct Backplane
 
     std::vector<Drive> drives;
     std::vector<std::shared_ptr<Led>> leds;
-    std::shared_ptr<std::vector<Mux>> muxes;
+    std::shared_ptr<boost::container::flat_set<Mux>> muxes;
 };
 
 std::unordered_map<std::string, Backplane> backplanes;
+std::vector<Drive> ownerlessDrives; // drives without a backplane
 
-void createDriveInterfaces(size_t referenceCount)
+static size_t getDriveCount()
 {
-    if (referenceCount != 1)
+    size_t count = 0;
+    for (const auto& [key, backplane] : backplanes)
     {
-        return;
+        count += backplane.drives.size();
     }
-    for (auto& [name, backplane] : backplanes)
-    {
-        for (Drive& drive : backplane.drives)
-        {
-            drive.createDriveIface();
-        }
-    }
+    return count + ownerlessDrives.size();
 }
 
-void updateAssociations()
+void updateAssets()
 {
-    constexpr const char* driveType =
-        "xyz.openbmc_project.Inventory.Item.Drive";
+    static constexpr const char* nvmeType =
+        "xyz.openbmc_project.Inventory.Item.NVMe";
+    static const std::string assetTag =
+        "xyz.openbmc_project.Inventory.Decorator.Asset";
 
     conn->async_method_call(
         [](const boost::system::error_code ec, const GetSubTreeType& subtree) {
@@ -548,6 +540,10 @@ void updateAssociations()
                 std::cerr << "Error contacting mapper " << ec.message() << "\n";
                 return;
             }
+
+            // drives may get an owner during this, or we might disover more
+            // drives
+            ownerlessDrives.clear();
             for (const auto& [path, objDict] : subtree)
             {
                 if (objDict.empty())
@@ -561,48 +557,49 @@ void updateAssociations()
                 {
                     continue;
                 }
-                std::shared_ptr<bool> referenceCount = std::make_shared<bool>();
+                if (std::find(objDict.begin()->second.begin(),
+                              objDict.begin()->second.end(),
+                              assetTag) == objDict.begin()->second.end())
+                {
+                    // no asset tag to associate to
+                    continue;
+                }
+
                 conn->async_method_call(
-                    [path, referenceCount](
-                        const boost::system::error_code ec2,
-                        const boost::container::flat_map<
-                            std::string, std::variant<uint64_t>>& values) {
+                    [path](const boost::system::error_code ec2,
+                           const boost::container::flat_map<
+                               std::string,
+                               std::variant<uint64_t, std::string>>& values) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
                                       << ec2.message() << " " << __FUNCTION__
                                       << "\n";
-                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
                         auto findBus = values.find("Bus");
-                        auto findIndex = values.find("Index");
 
-                        if (findBus == values.end() ||
-                            findIndex == values.end())
+                        if (findBus == values.end())
                         {
                             std::cerr << "Illegal interface at " << path
                                       << "\n";
-                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
+                        // find the mux bus and addr
                         size_t muxBus = static_cast<size_t>(
                             std::get<uint64_t>(findBus->second));
-                        size_t driveIndex = static_cast<size_t>(
-                            std::get<uint64_t>(findIndex->second));
                         std::filesystem::path muxPath =
                             "/sys/bus/i2c/devices/i2c-" +
                             std::to_string(muxBus) + "/mux_device";
                         if (!std::filesystem::is_symlink(muxPath))
                         {
                             std::cerr << path << " mux does not exist\n";
-                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
-                        // we should be getting something of the form 7-0052 for
-                        // bus 7 addr 52
+                        // we should be getting something of the form 7-0052
+                        // for bus 7 addr 52
                         std::string fname =
                             std::filesystem::read_symlink(muxPath).filename();
                         auto findDash = fname.find('-');
@@ -611,7 +608,6 @@ void updateAssociations()
                             findDash + 1 >= fname.size())
                         {
                             std::cerr << path << " mux path invalid\n";
-                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
 
@@ -621,9 +617,42 @@ void updateAssociations()
                         size_t bus = static_cast<size_t>(std::stoi(busStr));
                         size_t addr =
                             static_cast<size_t>(std::stoi(muxStr, nullptr, 16));
+                        size_t muxIndex = 0;
+
+                        // find the channel of the mux the drive is on
+                        std::ifstream nameFile("/sys/bus/i2c/devices/i2c-" +
+                                               std::to_string(muxBus) +
+                                               "/name");
+                        if (!nameFile)
+                        {
+                            std::cerr << "Unable to open name file of bus "
+                                      << muxBus << "\n";
+                            return;
+                        }
+
+                        std::string nameStr;
+                        std::getline(nameFile, nameStr);
+
+                        // file is of the form "i2c-4-mux (chan_id 1)", get chan
+                        // assume single digit chan
+                        const std::string prefix = "chan_id ";
+                        size_t findId = nameStr.find(prefix);
+                        if (findId == std::string::npos ||
+                            findId + 1 >= nameStr.size())
+                        {
+                            std::cerr << "Illegal name file on bus " << muxBus
+                                      << "\n";
+                        }
+
+                        std::string indexStr =
+                            nameStr.substr(findId + prefix.size(), 1);
+
+                        size_t driveIndex = std::stoi(indexStr);
+
                         Backplane* parent = nullptr;
                         for (auto& [name, backplane] : backplanes)
                         {
+                            muxIndex = 0;
                             for (const Mux& mux : *(backplane.muxes))
                             {
                                 if (bus == mux.bus && addr == mux.address)
@@ -631,37 +660,54 @@ void updateAssociations()
                                     parent = &backplane;
                                     break;
                                 }
+                                muxIndex += mux.channels;
                             }
                         }
+                        boost::container::flat_map<std::string, std::string>
+                            assetInventory;
+                        const std::array<const char*, 4> assetKeys = {
+                            "PartNumber", "SerialNumber", "Manufacturer",
+                            "Model"};
+                        for (const auto& [key, value] : values)
+                        {
+                            if (std::find(assetKeys.begin(), assetKeys.end(),
+                                          key) == assetKeys.end())
+                            {
+                                continue;
+                            }
+                            assetInventory[key] = std::get<std::string>(value);
+                        }
+
+                        // assume its a M.2 or something without a hsbp
                         if (parent == nullptr)
                         {
-                            std::cerr << "Failed to find mux at bus " << bus
-                                      << ", addr " << addr << "\n";
-                            createDriveInterfaces(referenceCount.use_count());
+                            auto& drive = ownerlessDrives.emplace_back(
+                                getDriveCount() + 1, true, true, true, false);
+                            drive.createAsset(assetInventory);
                             return;
                         }
+
+                        driveIndex += muxIndex;
+
                         if (parent->drives.size() <= driveIndex)
                         {
-
                             std::cerr << "Illegal drive index at " << path
                                       << " " << driveIndex << "\n";
-                            createDriveInterfaces(referenceCount.use_count());
                             return;
                         }
+
                         Drive& drive = parent->drives[driveIndex];
-                        drive.removeDriveIface();
-                        drive.createAssociation(path);
-                        createDriveInterfaces(referenceCount.use_count());
+                        drive.createAsset(assetInventory);
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
-                    "xyz.openbmc_project.Inventory.Item.Drive");
+                    "" /*all interface items*/);
             }
         },
         mapper::busName, mapper::path, mapper::interface, mapper::subtree, "/",
-        0, std::array<const char*, 1>{driveType});
+        0, std::array<const char*, 1>{nvmeType});
 }
 
-void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
+void populateMuxes(std::shared_ptr<boost::container::flat_set<Mux>> muxes,
                    std::string& rootPath)
 {
     const static std::array<const std::string, 4> muxTypes = {
@@ -679,7 +725,8 @@ void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
             }
             std::shared_ptr<std::function<void()>> callback =
                 std::make_shared<std::function<void()>>(
-                    []() { updateAssociations(); });
+                    []() { updateAssets(); });
+            size_t index = 0; // as we use a flat map, these are sorted
             for (const auto& [path, objDict] : subtree)
             {
                 if (objDict.empty() || objDict.begin()->second.empty())
@@ -708,10 +755,12 @@ void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
                 }
 
                 conn->async_method_call(
-                    [path, muxes, callback](
+                    [path, muxes, callback, index](
                         const boost::system::error_code ec2,
                         const boost::container::flat_map<
-                            std::string, std::variant<uint64_t>>& values) {
+                            std::string,
+                            std::variant<uint64_t, std::vector<std::string>>>&
+                            values) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
@@ -721,6 +770,7 @@ void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
                         }
                         auto findBus = values.find("Bus");
                         auto findAddress = values.find("Address");
+                        auto findChannelNames = values.find("ChannelNames");
                         if (findBus == values.end() ||
                             findAddress == values.end())
                         {
@@ -732,7 +782,10 @@ void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
                             std::get<uint64_t>(findBus->second));
                         size_t address = static_cast<size_t>(
                             std::get<uint64_t>(findAddress->second));
-                        muxes->emplace_back(bus, address);
+                        std::vector<std::string> channels =
+                            std::get<std::vector<std::string>>(
+                                findChannelNames->second);
+                        muxes->emplace(bus, address, channels.size(), index);
                         if (callback.use_count() == 1)
                         {
                             (*callback)();
@@ -740,6 +793,7 @@ void populateMuxes(std::shared_ptr<std::vector<Mux>> muxes,
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     *interface);
+                index++;
             }
         },
         mapper::busName, mapper::path, mapper::interface, mapper::subtree,
@@ -849,7 +903,7 @@ int main()
     sdbusplus::bus::match::match drive(
         *conn,
         "type='signal',member='PropertiesChanged',arg0='xyz.openbmc_project."
-        "Inventory.Item.Drive'",
+        "Inventory.Item.NVMe'",
         [&callbackTimer](sdbusplus::message::message& message) {
             callbackTimer.expires_after(std::chrono::seconds(2));
             if (message.get_sender() == conn->get_unique_name())
