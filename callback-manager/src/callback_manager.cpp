@@ -271,7 +271,7 @@ void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
                           << "\n";
             }
 
-            auto findAssociations = values.find("associations");
+            auto findAssociations = values.find("Associations");
             if (findAssociations == values.end())
             {
                 return;
@@ -319,7 +319,7 @@ void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
             bool fatal = globalCritical && localCritical;
             bool critical = globalWarning && localCritical;
-            bool warning = globalWarning && localWarning;
+            bool warning = globalWarning && !critical;
 
             fatalAssertMap[message.get_path()]["association"] = fatal;
             criticalAssertMap[message.get_path()]["association"] = critical;
