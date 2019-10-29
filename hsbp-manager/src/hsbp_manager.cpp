@@ -145,9 +145,10 @@ struct Led : std::enable_shared_from_this<Led>
 
 struct Drive
 {
-    Drive(size_t driveIndex, bool isPresent, bool isOperational, bool nvme,
+    Drive(size_t driveIndex, bool present, bool isOperational, bool nvme,
           bool rebuilding) :
-        isNvme(nvme)
+        isNvme(nvme),
+        isPresent(present)
     {
         constexpr const char* basePath =
             "/xyz/openbmc_project/inventory/item/drive/Drive_";
@@ -160,7 +161,28 @@ struct Drive
         operationalIface = objServer.add_interface(
             itemIface->get_object_path(),
             "xyz.openbmc_project.State.Decorator.OperationalStatus");
-        operationalIface->register_property("Functional", isOperational);
+
+        operationalIface->register_property(
+            "Functional", isOperational,
+            [this](const bool req, bool& property) {
+                if (!isPresent)
+                {
+                    return 0;
+                }
+                if (property == req)
+                {
+                    return 1;
+                }
+                property = req;
+                if (req)
+                {
+                    clearFailed();
+                    return 1;
+                }
+                markFailed();
+                return 1;
+            });
+
         operationalIface->initialize();
         rebuildingIface = objServer.add_interface(
             itemIface->get_object_path(), "xyz.openbmc_project.State.Drive");
@@ -170,6 +192,16 @@ struct Drive
             objServer.add_interface(itemIface->get_object_path(),
                                     "xyz.openbmc_project.Inventory.Item.Drive");
         driveIface->initialize();
+        associations = objServer.add_interface(itemIface->get_object_path(),
+                                               association::interface);
+        associations->register_property("Associations",
+                                        std::vector<Association>{});
+        associations->initialize();
+
+        if (isPresent && (!isOperational || rebuilding))
+        {
+            markFailed();
+        }
     }
     virtual ~Drive()
     {
@@ -178,6 +210,7 @@ struct Drive
         objServer.remove_interface(rebuildingIface);
         objServer.remove_interface(assetIface);
         objServer.remove_interface(driveIface);
+        objServer.remove_interface(associations);
     }
 
     void createAsset(
@@ -197,13 +230,38 @@ struct Drive
         assetIface->initialize();
     }
 
+    void markFailed(void)
+    {
+        // todo: maybe look this up via mapper
+        constexpr const char* globalInventoryPath =
+            "/xyz/openbmc_project/CallbackManager";
+
+        if (!isPresent)
+        {
+            return;
+        }
+
+        operationalIface->set_property("Functional", false);
+        std::vector<Association> warning = {
+            {"", "warning", globalInventoryPath}};
+        associations->set_property("Associations", warning);
+    }
+
+    void clearFailed(void)
+    {
+        operationalIface->set_property("Functional", true);
+        associations->set_property("Associations", std::vector<Association>{});
+    }
+
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> operationalIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> rebuildingIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> assetIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> driveIface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> associations;
 
     bool isNvme;
+    bool isPresent;
 };
 
 struct Backplane
@@ -337,18 +395,26 @@ struct Backplane
     {
 
         uint8_t nvme = ifdet ^ presence;
-        for (size_t ii = 0; ii < maxDrives; ii++)
+        size_t ii = 0;
+
+        for (auto it = drives.begin(); it != drives.end(); it++, ii++)
         {
             bool isNvme = nvme & (1 << ii);
             bool isPresent = isNvme || (presence & (1 << ii));
             bool isFailed = !isPresent || (failed & (1 << ii));
             bool isRebuilding = isPresent && (rebuilding & (1 << ii));
 
-            Drive& drive = drives[ii];
-            drive.isNvme = isNvme;
-            drive.itemIface->set_property("Present", isPresent);
-            drive.operationalIface->set_property("Functional", !isFailed);
-            drive.rebuildingIface->set_property("Rebuilding", isRebuilding);
+            it->isNvme = isNvme;
+            it->itemIface->set_property("Present", isPresent);
+            it->rebuildingIface->set_property("Rebuilding", isRebuilding);
+            if (isFailed || isRebuilding)
+            {
+                it->markFailed();
+            }
+            else
+            {
+                it->clearFailed();
+            }
         }
     }
 
@@ -508,13 +574,13 @@ struct Backplane
     std::shared_ptr<sdbusplus::asio::dbus_interface> hsbpItemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> versionIface;
 
-    std::vector<Drive> drives;
+    std::list<Drive> drives;
     std::vector<std::shared_ptr<Led>> leds;
     std::shared_ptr<boost::container::flat_set<Mux>> muxes;
 };
 
 std::unordered_map<std::string, Backplane> backplanes;
-std::vector<Drive> ownerlessDrives; // drives without a backplane
+std::list<Drive> ownerlessDrives; // drives without a backplane
 
 static size_t getDriveCount()
 {
@@ -695,9 +761,10 @@ void updateAssets()
                                       << " " << driveIndex << "\n";
                             return;
                         }
+                        auto it = parent->drives.begin();
+                        std::advance(it, driveIndex);
 
-                        Drive& drive = parent->drives[driveIndex];
-                        drive.createAsset(assetInventory);
+                        it->createAsset(assetInventory);
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     "" /*all interface items*/);
@@ -924,6 +991,10 @@ int main()
                 populate();
             });
         });
+
+    auto iface =
+        objServer.add_interface("/xyz/openbmc_project/inventory/item/storage",
+                                "xyz.openbmc_project.inventory.item.storage");
 
     io.post([]() { populate(); });
     setupPowerMatch(conn);
