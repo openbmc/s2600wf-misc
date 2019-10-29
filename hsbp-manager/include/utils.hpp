@@ -71,6 +71,12 @@ const static constexpr char* path = "/xyz/openbmc_project/state/host0";
 const static constexpr char* property = "CurrentHostState";
 } // namespace power
 
+namespace association
+{
+const static constexpr char* interface =
+    "xyz.openbmc_project.Association.Definitions";
+} // namespace association
+
 namespace hsbp
 {
 enum class registers : uint8_t
