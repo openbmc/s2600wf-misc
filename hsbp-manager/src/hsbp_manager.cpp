@@ -148,13 +148,18 @@ struct Drive
     Drive(size_t driveIndex, bool present, bool isOperational, bool nvme,
           bool rebuilding) :
         isNvme(nvme),
-        isPresent(present)
+        isPresent(present), index(driveIndex)
     {
         constexpr const char* basePath =
             "/xyz/openbmc_project/inventory/item/drive/Drive_";
         itemIface = objServer.add_interface(
             basePath + std::to_string(driveIndex), inventory::interface);
         itemIface->register_property("Present", isPresent);
+        if (isPresent && !isNvme)
+        {
+            // nvme drives get detected by their fru
+            logDeviceAdded("Drive", std::to_string(index), "N/A");
+        }
         itemIface->register_property("PrettyName",
                                      "Drive " + std::to_string(driveIndex));
         itemIface->initialize();
@@ -245,12 +250,32 @@ struct Drive
         std::vector<Association> warning = {
             {"", "warning", globalInventoryPath}};
         associations->set_property("Associations", warning);
+        logDriveError("Drive " + std::to_string(index));
     }
 
     void clearFailed(void)
     {
         operationalIface->set_property("Functional", true);
         associations->set_property("Associations", std::vector<Association>{});
+    }
+
+    void setPresent(bool set)
+    {
+        // nvme drives get detected by their fru
+        if (isNvme || set == isPresent)
+        {
+            return;
+        }
+        itemIface->set_property("Present", set);
+        isPresent = set;
+        if (isPresent)
+        {
+            logDeviceAdded("Drive", std::to_string(index), "N/A");
+        }
+        else
+        {
+            logDeviceRemoved("Drive", std::to_string(index), "N/A");
+        }
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
@@ -262,6 +287,7 @@ struct Drive
 
     bool isNvme;
     bool isPresent;
+    size_t index;
 };
 
 struct Backplane
@@ -405,8 +431,7 @@ struct Backplane
             bool isRebuilding = isPresent && (rebuilding & (1 << ii));
 
             it->isNvme = isNvme;
-            it->itemIface->set_property("Present", isPresent);
-            it->isPresent = isPresent;
+            it->setPresent(isPresent);
             it->rebuildingIface->set_property("Rebuilding", isRebuilding);
             if (isFailed || isRebuilding)
             {
