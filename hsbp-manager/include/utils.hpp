@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 
+#include <systemd/sd-journal.h>
+
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -183,4 +185,29 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
         },
         power::busname, power::path, properties::interface, properties::get,
         power::interface, power::property);
+}
+
+inline void logDeviceAdded(const std::string& model, const std::string& type,
+                           const std::string& sn)
+{
+    sd_journal_send("MESSAGE=%s", "Inventory Added", "PRIORITY=%i", LOG_ERR,
+                    "REDFISH_MESSAGE_ID=%s", "OpenBMC.0.1.InventoryAdded",
+                    "REDFISH_MESSAGE_ARGS=%s,%s,%s", model.c_str(),
+                    type.c_str(), sn.c_str(), NULL);
+}
+
+inline void logDeviceRemoved(const std::string& model, const std::string& type,
+                             const std::string& sn)
+{
+    sd_journal_send("MESSAGE=%s", "Inventory Removed", "PRIORITY=%i", LOG_ERR,
+                    "REDFISH_MESSAGE_ID=%s", "OpenBMC.0.1.InventoryRemoved",
+                    "REDFISH_MESSAGE_ARGS=%s,%s,%s", model.c_str(),
+                    type.c_str(), sn.c_str(), NULL);
+}
+
+inline void logDriveError(const std::string& name)
+{
+    sd_journal_send("MESSAGE=%s", "Drive Error", "PRIORITY=%i", LOG_ERR,
+                    "REDFISH_MESSAGE_ID=%s", "OpenBMC.0.1.DriveError",
+                    "REDFISH_MESSAGE_ARGS=%s", name.c_str(), NULL);
 }
