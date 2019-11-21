@@ -35,6 +35,9 @@ using BasicVariantType =
                  double, int32_t, uint32_t, int16_t, uint16_t, uint8_t, bool>;
 using Association = std::tuple<std::string, std::string, std::string>;
 
+constexpr const char* assetTag =
+    "xyz.openbmc_project.Inventory.Decorator.Asset";
+
 namespace mapper
 {
 constexpr const char* busName = "xyz.openbmc_project.ObjectMapper";

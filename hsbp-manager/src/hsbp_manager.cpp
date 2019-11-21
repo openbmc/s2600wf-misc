@@ -301,7 +301,39 @@ struct Backplane
         muxes(std::make_shared<boost::container::flat_set<Mux>>())
     {
     }
-    void run()
+    void populateAsset(const std::string& rootPath, const std::string& busname)
+    {
+        conn->async_method_call(
+            [assetIface{assetInterface}, hsbpIface{hsbpItemIface}](
+                const boost::system::error_code ec,
+                const boost::container::flat_map<
+                    std::string, std::variant<std::string>>& values) mutable {
+                if (ec)
+                {
+                    std::cerr
+                        << "Error getting asset tag from HSBP configuration\n";
+
+                    return;
+                }
+                assetIface = objServer.add_interface(
+                    hsbpIface->get_object_path(), assetTag);
+                for (const auto& [key, value] : values)
+                {
+                    const std::string* ptr = std::get_if<std::string>(&value);
+                    if (ptr == nullptr)
+                    {
+                        std::cerr << key << " Invalid type!\n";
+                        continue;
+                    }
+                    assetIface->register_property(key, *ptr);
+                }
+                assetIface->initialize();
+            },
+            busname, rootPath, "org.freedesktop.DBus.Properties", "GetAll",
+            assetTag);
+    }
+
+    void run(const std::string& rootPath, const std::string& busname)
     {
         file = open(("/dev/i2c-" + std::to_string(bus)).c_str(),
                     O_RDWR | O_CLOEXEC);
@@ -334,6 +366,11 @@ struct Backplane
         hsbpItemIface->register_property("PrettyName", name);
         hsbpItemIface->initialize();
 
+        storageInterface = objServer.add_interface(
+            hsbpItemIface->get_object_path(),
+            "xyz.openbmc_project.Inventory.Item.StorageController");
+        storageInterface->initialize();
+
         versionIface =
             objServer.add_interface(hsbpItemIface->get_object_path(),
                                     "xyz.openbmc_project.Software.Version");
@@ -347,6 +384,8 @@ struct Backplane
         versionIface->initialize();
         getPresence(presence);
         getIFDET(ifdet);
+
+        populateAsset(rootPath, busname);
 
         createDrives();
 
@@ -599,6 +638,8 @@ struct Backplane
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> hsbpItemIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> versionIface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> storageInterface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> assetInterface;
 
     std::list<Drive> drives;
     std::vector<std::shared_ptr<Led>> leds;
@@ -622,8 +663,6 @@ void updateAssets()
 {
     static constexpr const char* nvmeType =
         "xyz.openbmc_project.Inventory.Item.NVMe";
-    static const std::string assetTag =
-        "xyz.openbmc_project.Inventory.Decorator.Asset";
 
     conn->async_method_call(
         [](const boost::system::error_code ec, const GetSubTreeType& subtree) {
@@ -911,9 +950,9 @@ void populate()
 
                 const std::string& owner = objDict.begin()->first;
                 conn->async_method_call(
-                    [path](const boost::system::error_code ec2,
-                           const boost::container::flat_map<
-                               std::string, BasicVariantType>& resp) {
+                    [path, owner](const boost::system::error_code ec2,
+                                  const boost::container::flat_map<
+                                      std::string, BasicVariantType>& resp) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
@@ -955,7 +994,7 @@ void populate()
                         const auto& [backplane, status] = backplanes.emplace(
                             *name,
                             Backplane(*bus, *address, *backplaneIndex, *name));
-                        backplane->second.run();
+                        backplane->second.run(parentPath, owner);
                         populateMuxes(backplane->second.muxes, parentPath);
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
