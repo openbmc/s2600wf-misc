@@ -372,7 +372,7 @@ struct Backplane
         storageInterface->initialize();
 
         versionIface =
-            objServer.add_interface(hsbpItemIface->get_object_path(),
+            objServer.add_interface("/xyz/openbmc_project/software/" + dbusName,
                                     "xyz.openbmc_project.Software.Version");
         versionIface->register_property("Version", zeroPad(bootVer) + "." +
                                                        zeroPad(fpgaVer) + "." +
