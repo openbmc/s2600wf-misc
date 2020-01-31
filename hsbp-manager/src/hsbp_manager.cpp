@@ -382,6 +382,25 @@ struct Backplane
             std::string(
                 "xyz.openbmc_project.Software.Version.VersionPurpose.HSBP"));
         versionIface->initialize();
+
+        constexpr const char* softwareActivationIntf =
+            "xyz.openbmc_project.Software.Activation";
+
+        auto activationIface =
+            objServer.add_interface("/xyz/openbmc_project/software/" + dbusName,
+                                    softwareActivationIntf);
+
+        activationIface->register_property(
+            "Activation",
+            std::string(
+                "xyz.openbmc_project.Software.Activation.Activations.Active"));
+        activationIface->register_property(
+            "RequestedActivation",
+            std::string("xyz.openbmc_project.Software.Activation."
+                        "RequestedActivations.None"));
+
+        activationIface->initialize();
+
         getPresence(presence);
         getIFDET(ifdet);
 
