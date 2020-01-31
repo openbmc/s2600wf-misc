@@ -333,6 +333,49 @@ struct Backplane
             assetTag);
     }
 
+    void createAndActivateHSBP()
+    {
+        /* Creation and Activation interface represents activation state for an
+         * associated service xyz.openbmc_project.Software.Version. Since its
+         * are already active, set "activation" to Active and
+         * "RequestedActivation" to None.
+         */
+
+        constexpr const char* softwareVerIntf =
+            "xyz.openbmc_project.Software.Version";
+        constexpr const char* softwareActivationIntf =
+            "xyz.openbmc_project.Software.Activation";
+
+        auto iface = objServer.add_interface(
+            "/xyz/openbmc_project/software/J85894_HSBP_1", softwareVerIntf);
+
+        iface->register_property(
+            "Purpose", std::string("xyz.openbmc_project.Software.Version."
+                                   "VersionPurpose.J85894_HSBP_1"));
+        iface->register_property("Version", zeroPad(bootVer) + "." +
+                                                zeroPad(fpgaVer) + "." +
+                                                zeroPad(securityRev));
+
+        iface->initialize();
+
+        auto activationIface = objServer.add_interface(
+            "/xyz/openbmc_project/software/J85894_HSBP_1",
+            softwareActivationIntf);
+
+        activationIface->register_property(
+            "Activation",
+            std::string(
+                "xyz.openbmc_project.Software.Activation.Activations.Active"));
+        activationIface->register_property(
+            "RequestedActivation",
+            std::string("xyz.openbmc_project.Software.Activation."
+                        "RequestedActivations.None"));
+
+        activationIface->initialize();
+
+        return;
+    }
+
     void run(const std::string& rootPath, const std::string& busname)
     {
         file = open(("/dev/i2c-" + std::to_string(bus)).c_str(),
@@ -382,6 +425,9 @@ struct Backplane
             std::string(
                 "xyz.openbmc_project.Software.Version.VersionPurpose.HSBP"));
         versionIface->initialize();
+
+        createAndActivateHSBP();
+
         getPresence(presence);
         getIFDET(ifdet);
 
