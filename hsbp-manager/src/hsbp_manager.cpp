@@ -76,6 +76,20 @@ enum class BlinkPattern : uint8_t
     terminate = 0x3
 };
 
+static void rescanFruDeviceBus(size_t bus)
+{
+    conn->async_method_call(
+        [bus](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cerr << "Error trigger rescan at bus " << bus << "\n";
+            }
+        },
+        "xyz.openbmc_project.FruDevice", "/xyz/openbmc_project/FruDevice",
+        "xyz.openbmc_project.FruDeviceManager", "ReScanBus",
+        static_cast<uint8_t>(bus));
+}
+
 struct Led : std::enable_shared_from_this<Led>
 {
     // led pattern addresses start at 0x10
@@ -259,10 +273,10 @@ struct Drive
         associations->set_property("Associations", std::vector<Association>{});
     }
 
-    void setPresent(bool set)
+    void setPresent(bool set, bool nvme)
     {
         // nvme drives get detected by their fru
-        if (isNvme || set == isPresent)
+        if (nvme || set == isPresent)
         {
             return;
         }
@@ -465,12 +479,21 @@ struct Backplane
         for (auto it = drives.begin(); it != drives.end(); it++, ii++)
         {
             bool isNvme = nvme & (1 << ii);
+            bool wasNvme = it->isNvme || isNvme;
             bool isPresent = isNvme || (presence & (1 << ii));
             bool isFailed = !isPresent || (failed & (1 << ii));
             bool isRebuilding = isPresent && (rebuilding & (1 << ii));
 
+            if (isNvme != it->isNvme)
+            {
+                rescanFruDeviceBus(bus);
+            }
+
             it->isNvme = isNvme;
-            it->setPresent(isPresent);
+
+            // if it was nvme, treat it as nvme for presence
+            it->setPresent(isPresent, wasNvme);
+
             it->rebuildingIface->set_property("Rebuilding", isRebuilding);
             if (isFailed || isRebuilding)
             {
