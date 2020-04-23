@@ -76,20 +76,6 @@ enum class BlinkPattern : uint8_t
     terminate = 0x3
 };
 
-static void rescanFruDeviceBus(size_t bus)
-{
-    conn->async_method_call(
-        [bus](const boost::system::error_code ec) {
-            if (ec)
-            {
-                std::cerr << "Error trigger rescan at bus " << bus << "\n";
-            }
-        },
-        "xyz.openbmc_project.FruDevice", "/xyz/openbmc_project/FruDevice",
-        "xyz.openbmc_project.FruDeviceManager", "ReScanBus",
-        static_cast<uint8_t>(bus));
-}
-
 struct Led : std::enable_shared_from_this<Led>
 {
     // led pattern addresses start at 0x10
@@ -169,11 +155,6 @@ struct Drive
         itemIface = objServer.add_interface(
             basePath + std::to_string(driveIndex), inventory::interface);
         itemIface->register_property("Present", isPresent);
-        if (isPresent && !isNvme)
-        {
-            // nvme drives get detected by their fru
-            logDeviceAdded("Drive", std::to_string(index), "N/A");
-        }
         itemIface->register_property("PrettyName",
                                      "Drive " + std::to_string(driveIndex));
         itemIface->initialize();
@@ -245,8 +226,13 @@ struct Drive
         for (const auto& [key, value] : data)
         {
             assetIface->register_property(key, value);
+            if (key == "SerialNumber")
+            {
+                serialNumber = value;
+            }
         }
         assetIface->initialize();
+        logPresent();
     }
 
     void markFailed(void)
@@ -273,23 +259,30 @@ struct Drive
         associations->set_property("Associations", std::vector<Association>{});
     }
 
-    void setPresent(bool set, bool nvme)
+    void setPresent(bool set)
     {
         // nvme drives get detected by their fru
-        if (nvme || set == isPresent)
+        if (set == isPresent)
         {
             return;
         }
         itemIface->set_property("Present", set);
         isPresent = set;
-        if (isPresent)
+        if (!isPresent)
         {
-            logDeviceAdded("Drive", std::to_string(index), "N/A");
+            logDeviceRemoved("Drive", std::to_string(index), serialNumber);
+            loggedPresent = false;
         }
-        else
+    }
+
+    void logPresent()
+    {
+        if (!isPresent || loggedPresent)
         {
-            logDeviceRemoved("Drive", std::to_string(index), "N/A");
+            return;
         }
+        logDeviceAdded("Drive", std::to_string(index), serialNumber);
+        loggedPresent = true;
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
@@ -302,16 +295,18 @@ struct Drive
     bool isNvme;
     bool isPresent;
     size_t index;
+    std::string serialNumber = "N/A";
+    bool loggedPresent = false;
 };
 
-struct Backplane
+struct Backplane : std::enable_shared_from_this<Backplane>
 {
 
     Backplane(size_t busIn, size_t addressIn, size_t backplaneIndexIn,
               const std::string& nameIn) :
         bus(busIn),
         address(addressIn), backplaneIndex(backplaneIndexIn - 1), name(nameIn),
-        timer(std::make_shared<boost::asio::steady_timer>(io)),
+        timer(boost::asio::steady_timer(io)),
         muxes(std::make_shared<boost::container::flat_set<Mux>>())
     {
     }
@@ -424,8 +419,14 @@ struct Backplane
 
     void runTimer()
     {
-        timer->expires_after(std::chrono::seconds(scanRateSeconds));
-        timer->async_wait([this](boost::system::error_code ec) {
+        timer.expires_after(std::chrono::seconds(scanRateSeconds));
+        timer.async_wait([weak{std::weak_ptr<Backplane>(shared_from_this())}](
+                             boost::system::error_code ec) {
+            auto self = weak.lock();
+            if (!self)
+            {
+                return;
+            }
             if (ec == boost::asio::error::operation_aborted)
             {
                 // we're being destroyed
@@ -440,29 +441,29 @@ struct Backplane
             if (!isPowerOn())
             {
                 // can't access hsbp when power is off
-                runTimer();
+                self->runTimer();
                 return;
             }
-            uint8_t curPresence = 0;
-            uint8_t curIFDET = 0;
-            uint8_t curFailed = 0;
-            uint8_t curRebuild = 0;
+            uint8_t curPresence = self->presence;
+            uint8_t curIFDET = self->ifdet;
+            uint8_t curFailed = self->failed;
+            uint8_t curRebuild = self->rebuilding;
 
-            getPresence(curPresence);
-            getIFDET(curIFDET);
-            getFailed(curFailed);
-            getRebuild(curRebuild);
+            self->getPresence(curPresence);
+            self->getIFDET(curIFDET);
+            self->getFailed(curFailed);
+            self->getRebuild(curRebuild);
 
-            if (curPresence != presence || curIFDET != ifdet ||
-                curFailed != failed || curRebuild != rebuilding)
+            if (curPresence != self->presence || curIFDET != self->ifdet ||
+                curFailed != self->failed || curRebuild != self->rebuilding)
             {
-                presence = curPresence;
-                ifdet = curIFDET;
-                failed = curFailed;
-                rebuilding = curRebuild;
-                updateDrives();
+                self->presence = curPresence;
+                self->ifdet = curIFDET;
+                self->failed = curFailed;
+                self->rebuilding = curRebuild;
+                self->updateDrives();
             }
-            runTimer();
+            self->runTimer();
         });
     }
 
@@ -495,20 +496,14 @@ struct Backplane
         for (auto it = drives.begin(); it != drives.end(); it++, ii++)
         {
             bool isNvme = nvme & (1 << ii);
-            bool wasNvme = it->isNvme || isNvme;
             bool isPresent = isNvme || (presence & (1 << ii));
             bool isFailed = !isPresent || (failed & (1 << ii));
             bool isRebuilding = isPresent && (rebuilding & (1 << ii));
 
-            if (isNvme != it->isNvme)
-            {
-                rescanFruDeviceBus(bus);
-            }
-
             it->isNvme = isNvme;
 
             // if it was nvme, treat it as nvme for presence
-            it->setPresent(isPresent, wasNvme);
+            it->setPresent(isPresent);
 
             it->rebuildingIface->set_property("Rebuilding", isRebuilding);
             if (isFailed || isRebuilding)
@@ -638,17 +633,27 @@ struct Backplane
         int ret = i2c_smbus_read_byte_data(file, addr);
         if (ret < 0)
         {
-            std::cerr << "Error " << __FUNCTION__ << "\n";
+            std::cerr << "Error " << __FUNCTION__ << " " << strerror(ret)
+                      << "\n";
             return false;
         }
         val = static_cast<uint8_t>(ret);
         return true;
     }
 
+    void logDrivePresence()
+    {
+        for (auto& drive : drives)
+        {
+            drive.logPresent();
+        }
+    }
+
     virtual ~Backplane()
     {
         objServer.remove_interface(hsbpItemIface);
         objServer.remove_interface(versionIface);
+        timer.cancel();
         if (file >= 0)
         {
             close(file);
@@ -659,7 +664,7 @@ struct Backplane
     size_t address;
     size_t backplaneIndex;
     std::string name;
-    std::shared_ptr<boost::asio::steady_timer> timer;
+    boost::asio::steady_timer timer;
     bool present = false;
     uint8_t typeId = 0;
     uint8_t bootVer = 0;
@@ -685,7 +690,7 @@ struct Backplane
     std::shared_ptr<boost::container::flat_set<Mux>> muxes;
 };
 
-std::unordered_map<std::string, Backplane> backplanes;
+std::unordered_map<std::string, std::shared_ptr<Backplane>> backplanes;
 std::list<Drive> ownerlessDrives; // drives without a backplane
 
 static size_t getDriveCount()
@@ -693,7 +698,7 @@ static size_t getDriveCount()
     size_t count = 0;
     for (const auto& [key, backplane] : backplanes)
     {
-        count += backplane.drives.size();
+        count += backplane->drives.size();
     }
     return count + ownerlessDrives.size();
 }
@@ -735,11 +740,19 @@ void updateAssets()
                     continue;
                 }
 
+                auto callback = std::make_shared<std::function<void()>>([]() {
+                    for (auto [_, backplane] : backplanes)
+                    {
+                        backplane->logDrivePresence();
+                    }
+                });
+
                 conn->async_method_call(
-                    [path](const boost::system::error_code ec2,
-                           const boost::container::flat_map<
-                               std::string,
-                               std::variant<uint64_t, std::string>>& values) {
+                    [callback, path](
+                        const boost::system::error_code ec2,
+                        const boost::container::flat_map<
+                            std::string, std::variant<uint64_t, std::string>>&
+                            values) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
@@ -823,11 +836,11 @@ void updateAssets()
                         for (auto& [name, backplane] : backplanes)
                         {
                             muxIndex = 0;
-                            for (const Mux& mux : *(backplane.muxes))
+                            for (const Mux& mux : *(backplane->muxes))
                             {
                                 if (bus == mux.bus && addr == mux.address)
                                 {
-                                    parent = &backplane;
+                                    parent = backplane.get();
                                     break;
                                 }
                                 muxIndex += mux.channels;
@@ -869,6 +882,10 @@ void updateAssets()
                         std::advance(it, driveIndex);
 
                         it->createAsset(assetInventory);
+                        if (callback.use_count() == 1)
+                        {
+                            (*callback)();
+                        }
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     "" /*all interface items*/);
@@ -1031,10 +1048,10 @@ void populate()
                         std::string parentPath =
                             std::filesystem::path(path).parent_path();
                         const auto& [backplane, status] = backplanes.emplace(
-                            *name,
-                            Backplane(*bus, *address, *backplaneIndex, *name));
-                        backplane->second.run(parentPath, owner);
-                        populateMuxes(backplane->second.muxes, parentPath);
+                            *name, std::make_shared<Backplane>(
+                                       *bus, *address, *backplaneIndex, *name));
+                        backplane->second->run(parentPath, owner);
+                        populateMuxes(backplane->second->muxes, parentPath);
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     configType);
@@ -1092,7 +1109,7 @@ int main()
                     std::cerr << "Timer error" << ec.message() << "\n";
                     return;
                 }
-                populate();
+                updateAssets();
             });
         });
 
