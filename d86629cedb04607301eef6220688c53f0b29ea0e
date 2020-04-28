@@ -1,0 +1,9 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Johnathan Mantey <johnathanx.mantey@intel.com>
+Code-Review+2: James Feist <james.feist@linux.intel.com>
+Submitted-by: James Feist <james.feist@linux.intel.com>
+Submitted-at: Tue, 28 Apr 2020 17:06:59 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/s2600wf-misc/+/31649
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
