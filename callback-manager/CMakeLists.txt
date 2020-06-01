@@ -12,8 +12,8 @@ option (YOCTO "Enable Building in Yocto" OFF)
 if (NOT YOCTO)
     externalproject_add (
         Boost URL
-        https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz
-        URL_MD5 d275cd85b00022313c171f602db59fc5 SOURCE_DIR
+        https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
+        URL_MD5 5f521b41b79bf8616582c4a8a2c10177 SOURCE_DIR
         "${CMAKE_BINARY_DIR}/boost-src" BINARY_DIR
         "${CMAKE_BINARY_DIR}/boost-build" CONFIGURE_COMMAND "" BUILD_COMMAND ""
         INSTALL_COMMAND mkdir -p "${CMAKE_BINARY_DIR}/prefix/include/" && cp -R
