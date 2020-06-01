@@ -22,19 +22,19 @@ if (NOT YOCTO)
     externalproject_add (sdbusplus-project PREFIX
                          ${CMAKE_BINARY_DIR}/sdbusplus-project GIT_REPOSITORY
                          https://github.com/openbmc/sdbusplus.git GIT_TAG
-                         bed15f0cee4784acdf151cca14efdfb98cb9d397 SOURCE_DIR
+                         fa3137a78e952134559bf7c41c4f29fa4afabe02 SOURCE_DIR
                          ${CMAKE_BINARY_DIR}/sdbusplus-src BINARY_DIR
                          ${CMAKE_BINARY_DIR}/sdbusplus-build CONFIGURE_COMMAND
                          "" BUILD_COMMAND cd ${CMAKE_BINARY_DIR}/sdbusplus-src
-                         && ./bootstrap.sh && ./configure --enable-transaction
-                         && make -j libsdbusplus.la INSTALL_COMMAND ""
+                         && meson build -Ddefault_library=static && ninja -C
+                         build libsdbusplus.a INSTALL_COMMAND ""
                          LOG_DOWNLOAD ON)
 
     include_directories (${CMAKE_BINARY_DIR}/sdbusplus-src)
     include_directories (${CMAKE_BINARY_DIR}/nlohmann/include)
     include_directories (${CMAKE_BINARY_DIR}/nlohmann/include/nlohmann)
     include_directories (${CMAKE_BINARY_DIR}/phosphor-dbus-interfaces/include)
-    link_directories (${CMAKE_BINARY_DIR}/sdbusplus-src/.libs)
+    link_directories (${CMAKE_BINARY_DIR}/sdbusplus-src/build)
 
     include_directories (${CMAKE_BINARY_DIR}/boost-src)
     set (CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/boost-src ${CMAKE_PREFIX_PATH})
