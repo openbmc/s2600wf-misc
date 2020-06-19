@@ -268,21 +268,21 @@ struct Drive
         }
         itemIface->set_property("Present", set);
         isPresent = set;
-        if (!isPresent)
-        {
-            logDeviceRemoved("Drive", std::to_string(index), serialNumber);
-            loggedPresent = false;
-        }
     }
 
     void logPresent()
     {
-        if (!isPresent || loggedPresent)
+        if (!isPresent && loggedPresent)
         {
+            logDeviceRemoved("Drive", std::to_string(index), "N/A");
+            loggedPresent = false;
             return;
         }
-        logDeviceAdded("Drive", std::to_string(index), serialNumber);
-        loggedPresent = true;
+        else if (isPresent && !loggedPresent)
+        {
+            logDeviceAdded("Drive", std::to_string(index), "N/A");
+            loggedPresent = true;
+        }
     }
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> itemIface;
@@ -457,13 +457,13 @@ struct Backplane : std::enable_shared_from_this<Backplane>
 
     void createDrives()
     {
-        uint8_t nvme = ifdet ^ presence;
         for (size_t ii = 0; ii < maxDrives; ii++)
         {
-            bool isNvme = nvme & (1 << ii);
-            bool isPresent = isNvme || (presence & (1 << ii));
-            bool isFailed = !isPresent || failed & (1 << ii);
-            bool isRebuilding = !isPresent && (rebuilding & (1 << ii));
+            uint8_t driveSlot = (1 << ii);
+            bool isNvme = ((ifdet & driveSlot) && !(presence & driveSlot));
+            bool isPresent = isNvme || (presence & driveSlot);
+            bool isFailed = !isPresent || failed & driveSlot;
+            bool isRebuilding = !isPresent && (rebuilding & driveSlot);
 
             // +1 to convert from 0 based to 1 based
             size_t driveIndex = (backplaneIndex * maxDrives) + ii + 1;
@@ -477,20 +477,19 @@ struct Backplane : std::enable_shared_from_this<Backplane>
 
     void updateDrives()
     {
-
-        uint8_t nvme = ifdet ^ presence;
         size_t ii = 0;
 
         for (auto it = drives.begin(); it != drives.end(); it++, ii++)
         {
-            bool isNvme = nvme & (1 << ii);
-            bool isPresent = isNvme || (presence & (1 << ii));
-            bool isFailed = !isPresent || (failed & (1 << ii));
-            bool isRebuilding = isPresent && (rebuilding & (1 << ii));
+            uint8_t driveSlot = (1 << ii);
+            bool isNvme = ((ifdet & driveSlot) && !(presence & driveSlot));
+            bool isPresent = isNvme || (presence & driveSlot);
+            bool isFailed = !isPresent || (failed & driveSlot);
+            bool isRebuilding = isPresent && (rebuilding & driveSlot);
 
             it->isNvme = isNvme;
-
             it->setPresent(isPresent);
+            it->logPresent();
 
             it->rebuildingIface->set_property("Rebuilding", isRebuilding);
             if (isFailed || isRebuilding)
@@ -628,14 +627,6 @@ struct Backplane : std::enable_shared_from_this<Backplane>
         return true;
     }
 
-    void logDrivePresence()
-    {
-        for (auto& drive : drives)
-        {
-            drive.logPresent();
-        }
-    }
-
     virtual ~Backplane()
     {
         objServer.remove_interface(hsbpItemIface);
@@ -727,19 +718,11 @@ void updateAssets()
                     continue;
                 }
 
-                auto callback = std::make_shared<std::function<void()>>([]() {
-                    for (auto [_, backplane] : backplanes)
-                    {
-                        backplane->logDrivePresence();
-                    }
-                });
-
                 conn->async_method_call(
-                    [callback, path](
-                        const boost::system::error_code ec2,
-                        const boost::container::flat_map<
-                            std::string, std::variant<uint64_t, std::string>>&
-                            values) {
+                    [path](const boost::system::error_code ec2,
+                           const boost::container::flat_map<
+                               std::string,
+                               std::variant<uint64_t, std::string>>& values) {
                         if (ec2)
                         {
                             std::cerr << "Error Getting Config "
@@ -869,10 +852,6 @@ void updateAssets()
                         std::advance(it, driveIndex);
 
                         it->createAsset(assetInventory);
-                        if (callback.use_count() == 1)
-                        {
-                            (*callback)();
-                        }
                     },
                     owner, path, "org.freedesktop.DBus.Properties", "GetAll",
                     "" /*all interface items*/);
