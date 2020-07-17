@@ -213,6 +213,12 @@ struct Drive
         objServer.remove_interface(associations);
     }
 
+    void removeAsset()
+    {
+        objServer.remove_interface(assetIface);
+        assetIface = nullptr;
+    }
+
     void createAsset(
         const boost::container::flat_map<std::string, std::string>& data)
     {
@@ -285,7 +291,7 @@ struct Drive
             logDeviceRemoved("Drive", std::to_string(index), serialNumber);
             serialNumber = "N/A";
             serialNumberInitialized = false;
-            return;
+            removeAsset();
         }
         else if (isPresent && !loggedPresent)
         {
