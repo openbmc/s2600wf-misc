@@ -16,6 +16,8 @@
 
 #include "callback_manager.hpp"
 
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_map.hpp>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
@@ -37,8 +39,7 @@ constexpr const char* ledManagerBusname =
 
 std::unique_ptr<AssociationManager> associationManager;
 
-enum class StatusSetting
-{
+enum class StatusSetting {
     none,
     ok,
     warn,
