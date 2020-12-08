@@ -1,9 +1,10 @@
 #pragma once
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <iostream>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
+
+#include <iostream>
 
 using Association = std::tuple<std::string, std::string, std::string>;
 
