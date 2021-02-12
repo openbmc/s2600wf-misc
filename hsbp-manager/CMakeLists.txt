@@ -34,11 +34,8 @@ set (
     -Wuseless-cast \
     -Wdouble-promotion \
     -Wformat=2 \
-    "
+    -fno-rtti"
 )
-# Temporarily disable rtti
-# See https://github.com/chriskohlhoff/asio/issues/533
-#    -fno-rtti
 
 option (YOCTO "Enable Building in Yocto" OFF)
 
