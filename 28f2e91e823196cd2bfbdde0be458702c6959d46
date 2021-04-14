@@ -1,0 +1,280 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4115fca1_32613a82",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "Probably this comment is not required",
+      "range": {
+        "startLine": 1053,
+        "startChar": 0,
+        "endLine": 1053,
+        "endChar": 35
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be44584c_5474af24",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1147,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "nit: consistency in commenting style. /* */ can be used everywhere for multi line comments",
+      "range": {
+        "startLine": 1120,
+        "startChar": 0,
+        "endLine": 1147,
+        "endChar": 29
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcb215d9_02d737db",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1149,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "magic number, please define this using a macro ?",
+      "range": {
+        "startLine": 1149,
+        "startChar": 7,
+        "endLine": 1149,
+        "endChar": 9
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "245786f8_e5f6b80e",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1151,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "should be uint8_t, no?",
+      "range": {
+        "startLine": 1151,
+        "startChar": 4,
+        "endLine": 1151,
+        "endChar": 8
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "577ac47e_ae6e4622",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1152,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "nit: camelCase",
+      "range": {
+        "startLine": 1152,
+        "startChar": 15,
+        "endLine": 1152,
+        "endChar": 29
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd1a82a5_77c88344",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1161,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "suggest you to use std::optional\u003cbitset\u003cMAX_CLOCK_STATUS\u003e\u003e as the return type of the function. In case of read errors, you could simply return a std::nullopt, so that the caller of the function will be able to distinguish between i2c read errors and actual read clockStatus registers.",
+      "range": {
+        "startLine": 1161,
+        "startChar": 8,
+        "endLine": 1161,
+        "endChar": 30
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccbf666e_0ba2fb4d",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1180,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "\u003c\u003c ?",
+      "range": {
+        "startLine": 1180,
+        "startChar": 34,
+        "endLine": 1180,
+        "endChar": 35
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2620e922_1d2122de",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1189,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be \u003c\u003c operator?",
+      "range": {
+        "startLine": 1189,
+        "startChar": 34,
+        "endLine": 1189,
+        "endChar": 36
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9c4c120_1bc6caf2",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1196,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "Please covert this to camelCase. Applicable to other functions too",
+      "range": {
+        "startLine": 1196,
+        "startChar": 5,
+        "endLine": 1196,
+        "endChar": 25
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f01667b_0df05a52",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1219,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "Nit: u_long definition could be architecture specific. May be we can extract out the required bytes outside and pass it here?\n\nuint8_t byte0 \u003d nvmeClockStatus \u0026 0xFF;\nuint8_t byte1 \u003d (nvmeClockStatus \u003e\u003e 8) \u0026 0xFF;\n...",
+      "range": {
+        "startLine": 1219,
+        "startChar": 63,
+        "endLine": 1219,
+        "endChar": 71
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79440dab_c3f0be05",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1388,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "nit: nvmeAlert. Please change variable names to camelCase everywhere in this file.",
+      "range": {
+        "startLine": 1388,
+        "startChar": 9,
+        "endLine": 1388,
+        "endChar": 19
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63d54313_b2e6b6e4",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1519,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-14T11:00:37Z",
+      "side": 1,
+      "message": "Please capture an error message before returning. Also, should we return here? If there are platforms without this pin definition (say they don\u0027t support hotplug drives), we could simply log an error and continue with rest of hsbp-manager\u0027s activities.",
+      "range": {
+        "startLine": 1519,
+        "startChar": 8,
+        "endLine": 1519,
+        "endChar": 18
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
