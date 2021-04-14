@@ -16,11 +16,14 @@
 
 #include "utils.hpp"
 
+#include <bitset>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_set.hpp>
 #include <filesystem>
 #include <fstream>
+#include <gpiod.hpp>
 #include <iostream>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
@@ -43,6 +46,10 @@ constexpr size_t maxDrives = 8; // only 1 byte alloted
 boost::asio::io_context io;
 auto conn = std::make_shared<sdbusplus::asio::connection>(io);
 sdbusplus::asio::object_server objServer(conn);
+
+// GPIO Lines and Event Descriptors
+static gpiod::line nvmeLvc3AlertLine;
+static boost::asio::posix::stream_descriptor nvmeLvc3AlertEvent(io);
 
 static std::string zeroPad(const uint8_t val)
 {
@@ -1043,6 +1050,381 @@ void populate()
         0, std::array<const char*, 1>{configType});
 }
 
+static bool hsbpRequestAlertGpioEvents(
+    const std::string& name, const std::function<void()>& handler,
+    gpiod::line& gpioLine,
+    boost::asio::posix::stream_descriptor& gpioEventDescriptor)
+{
+    // Find the GPIO line
+    gpioLine = gpiod::find_line(name);
+    if (!gpioLine)
+    {
+        std::cerr << "Failed to find the " << name << " line\n";
+        return false;
+    }
+
+    try
+    {
+        gpioLine.request(
+            {"hsbp-manager", gpiod::line_request::EVENT_BOTH_EDGES, 0});
+    }
+    catch (std::exception&)
+    {
+        std::cerr << "Failed to request events for " << name << "\n";
+        return false;
+    }
+
+    int gpioLineFd = gpioLine.event_get_fd();
+    if (gpioLineFd < 0)
+    {
+        std::cerr << "Failed to get " << name << " fd\n";
+        return false;
+    }
+
+    gpioEventDescriptor.assign(gpioLineFd);
+
+    gpioEventDescriptor.async_wait(
+        boost::asio::posix::stream_descriptor::wait_read,
+        [&name, handler](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cerr << name << " fd handler error: " << ec.message()
+                          << "\n";
+                return;
+            }
+            handler();
+        });
+    return true;
+}
+
+/******************************************************************************************
+ *   HSBP Position           CPLD SMB Address
+ *        1                   0xD0(0x68 7 bit)
+ *        2                   0xD2(0x69 7 bit)
+ *  we have max 2 HSBP per system. Closed chassis systems will either have 0 or
+ *2 HSBP's.
+ *******************************************************************************************/
+using std::bitset;
+#define HSBP_I2CBUS 4
+#define ALL_DRIVES_WITH_STATUS_BIT 17
+#define STATUS_ALL_DRIVES (ALL_DRIVES_WITH_STATUS_BIT - 1)
+#define ALL_CLOCK_BITS_DB2000 25
+#define STATUS_ALL_CLOCKS_DB2000 (ALL_CLOCK_BITS_DB2000 - 1)
+#define SINGLE_DRIVE_WITH_STATUS_BIT 9
+#define STATUS_SINGLE_DRIVE (SINGLE_DRIVE_WITH_STATUS_BIT - 1)
+
+std::bitset<ALL_DRIVES_WITH_STATUS_BIT> drivePresenceStatus(0);
+std::bitset<ALL_CLOCK_BITS_DB2000> driveClockStatus(0);
+constexpr const uint8_t hsbpCpldSmbaddr1 = 0x68;
+constexpr const uint8_t hsbpCpldSmbaddr2 = 0x69;
+constexpr const uint8_t db2000SlaveAddr = 0x6d;
+static int hsbpFd;
+
+bitset<ALL_CLOCK_BITS_DB2000> readDb2000ClockStatus(void)
+{
+    return driveClockStatus;
+}
+
+/********************************************************************
+ *  DB2000 Programming guide for PCIe Clocks enable/disable
+ *  CPU 0
+ * =================================================================
+ *  slot        Byte        bit number
+ *  Position   position
+ * =================================================================
+ *  7            0           5
+ *  6            0           4
+ *  5            0           3
+ *  4            2           7
+ *  3            1           3
+ *  2            1           2
+ *  1            1           1
+ *  0            1           0
+ *
+ *  CPU 1
+ * =================================================================
+ *  slot        Byte        bit number
+ *  Position   position
+ * =================================================================
+ *  7            1           6
+ *  6            1           7
+ *  5            2           0
+ *  4            2           1
+ *  3            1           5
+ *  2            2           4
+ *  1            2           2
+ *  0            2           3
+ *********************************************************************/
+std::optional<int>
+    updateClocksStatus(bitset<ALL_DRIVES_WITH_STATUS_BIT> nvmeDriveStatus)
+{
+    int ret;
+    bitset<ALL_CLOCK_BITS_DB2000> nvmeClockStatus(0);
+    /* mapping table for nvme drive index(0-15) to DB2000 register bit fields */
+    int slotToClockTable[] = {8,  9,  10, 11, 23, 3,  4,  5,
+                              19, 18, 20, 13, 17, 16, 15, 14};
+
+    for (std::size_t i = 0; i < (nvmeDriveStatus.size() - 1); i++)
+    {
+        if (nvmeDriveStatus.test(i))
+        {
+            nvmeClockStatus.set(slotToClockTable[i]);
+        }
+        else
+        {
+            nvmeClockStatus.reset(slotToClockTable[i]);
+        }
+    }
+
+    if (ioctl(hsbpFd, I2C_SLAVE_FORCE, db2000SlaveAddr) < 0)
+    {
+        std::cerr << "unable to set DB2000 address to " << db2000SlaveAddr
+                  << "\n";
+        return std::nullopt;
+    }
+    ret = i2c_smbus_write_byte_data(
+        hsbpFd, 0x80, static_cast<unsigned char>(nvmeClockStatus.to_ulong()));
+
+    if (ret < 0)
+    {
+        std::cerr << "Error: unable to write data to clock register "
+                  << __FUNCTION__ << __LINE__ << "\n";
+        return ret;
+    }
+
+    ret = i2c_smbus_write_byte_data(
+        hsbpFd, 0x81,
+        static_cast<unsigned char>((nvmeClockStatus >> 8).to_ulong()));
+
+    if (ret < 0)
+    {
+        std::cerr << "Error: unable to write data to clock register "
+                  << __FUNCTION__ << __LINE__ << "\n";
+        return ret;
+    }
+
+    ret = i2c_smbus_write_byte_data(
+        hsbpFd, 0x82,
+        static_cast<unsigned char>((nvmeClockStatus >> 16).to_ulong()));
+
+    if (ret < 0)
+    {
+        std::cerr << "Error: unable to write data to clock register "
+                  << __FUNCTION__ << __LINE__ << "\n";
+        return ret;
+    }
+    // Update global clock status
+    driveClockStatus = nvmeClockStatus;
+    driveClockStatus.set(STATUS_ALL_CLOCKS_DB2000, 1);
+    return 0;
+}
+
+bitset<SINGLE_DRIVE_WITH_STATUS_BIT>
+    getSingleHsbpDriveStatus(const uint8_t cpldSmbaddr)
+{
+    int valueReg8, valueReg9;
+    bitset<SINGLE_DRIVE_WITH_STATUS_BIT> singleDriveStatus(0);
+
+    // probe
+    if (ioctl(hsbpFd, I2C_SLAVE_FORCE, cpldSmbaddr) < 0)
+    {
+        std::cerr << "Failed to talk to cpldSmbaddr :  " << cpldSmbaddr << "\n";
+        return singleDriveStatus;
+    }
+
+    // read status of lower four drive connectivity
+    valueReg8 = i2c_smbus_read_byte_data(hsbpFd, 0x8);
+    if (valueReg8 < 0)
+    {
+        std::cerr << "Error: Unable to read cpld reg 0x8 " << __FUNCTION__
+                  << __LINE__ << "\n";
+        return singleDriveStatus;
+    }
+
+    // read status of upper four drive connectivity
+    valueReg9 = i2c_smbus_read_byte_data(hsbpFd, 0x9);
+    if (valueReg9 < 0)
+    {
+        std::cerr << "Error: Unable to read cpld reg 0x9 " << __FUNCTION__
+                  << __LINE__ << "\n";
+        return singleDriveStatus;
+    }
+
+    int loop;
+    // Find drives which have NVMe drive connected
+    for (loop = 0; loop < 8; loop++)
+    {
+        // Check if NVME drive detected
+        if ((valueReg8 & (1U << loop)) && (valueReg9 & ((1U << loop))) == 0)
+        {
+            singleDriveStatus.set(loop, 1);
+        }
+    }
+
+    // Reading successful, set the statusok bit
+    singleDriveStatus.set(STATUS_SINGLE_DRIVE, 1);
+    return singleDriveStatus;
+}
+
+/* Try reading both HSBP and report back if atleast one of them is found to be
+   connected. Status bit is set by the function even if one HSBP is responding
+ */
+bitset<ALL_DRIVES_WITH_STATUS_BIT> getCompleteDriveStatus(void)
+{
+    bitset<SINGLE_DRIVE_WITH_STATUS_BIT> singleDrvStatus(0);
+    bitset<ALL_DRIVES_WITH_STATUS_BIT> currDriveStatus(0);
+    int i, j;
+
+    singleDrvStatus = getSingleHsbpDriveStatus(hsbpCpldSmbaddr1);
+
+    if (singleDrvStatus[STATUS_SINGLE_DRIVE] == 1)
+    {
+        for (i = 0; i < 8; i++)
+        {
+            currDriveStatus[i] = singleDrvStatus[i];
+        }
+        // set valid bit if a single hsbp drive status is valid
+        currDriveStatus.set(STATUS_ALL_DRIVES);
+    }
+    else
+    {
+        currDriveStatus &= (~0xFF);
+    }
+
+    singleDrvStatus = getSingleHsbpDriveStatus(hsbpCpldSmbaddr2);
+    if (singleDrvStatus[STATUS_SINGLE_DRIVE] == 1)
+    {
+        for (i = 8, j = 0; i < 16; i++, j++)
+        {
+            currDriveStatus[i] = singleDrvStatus[j];
+        }
+        // set valid bit if a single hsbp drive status is valid
+        currDriveStatus.set(STATUS_ALL_DRIVES);
+    }
+    else
+    {
+        currDriveStatus &= (~(0xFF << 8));
+    }
+    return currDriveStatus;
+}
+
+void cpldReadingInit(void)
+{
+    bitset<ALL_CLOCK_BITS_DB2000> clockstatus(0);
+    hsbpFd = open(("/dev/i2c-" + std::to_string(HSBP_I2CBUS)).c_str(),
+                  O_RDWR | O_CLOEXEC);
+    if (hsbpFd < 0)
+    {
+        std::cerr << "unable to open HSBP_I2CBUS " << HSBP_I2CBUS << "\n";
+    }
+    bitset<ALL_DRIVES_WITH_STATUS_BIT> currDrvStatus = getCompleteDriveStatus();
+    if (currDrvStatus[STATUS_ALL_DRIVES] == 1)
+    {
+        // update global drive presence for next time comparison
+        drivePresenceStatus = currDrvStatus;
+    }
+    else
+    {
+        close(hsbpFd);
+    }
+
+    std::optional<int> updateStatus = updateClocksStatus(drivePresenceStatus);
+    if (updateStatus.has_value())
+    {
+        if (updateStatus == -1)
+        {
+            std::cerr << "error: DB2000 register read issue "
+                      << "\n";
+            close(hsbpFd);
+        }
+    }
+    else
+    {
+        std::cerr << "error: DB2000 i2c access issue "
+                  << "\n";
+        close(hsbpFd);
+    }
+}
+
+// Callback handler passed to hsbpRequestAlertGpioEvents:
+static void nvmeLvc3AlertHandler()
+{
+    gpiod::line_event gpioLineEvent = nvmeLvc3AlertLine.event_read();
+
+    if (gpioLineEvent.event_type == gpiod::line_event::FALLING_EDGE)
+    {
+        /* Step 1: Either drive is removed or inserted; read the CPLD reg 8 and
+                 9 to determine if drive is added or removed. Need to compare
+                 current number of drives with previous state to determine it.
+         */
+        bitset<ALL_DRIVES_WITH_STATUS_BIT> currDrvStat =
+            getCompleteDriveStatus();
+        if (currDrvStat[STATUS_ALL_DRIVES] == 1)
+        {
+            if (drivePresenceStatus != currDrvStat)
+            {
+                uint32_t tmpVar = static_cast<uint32_t>(
+                    (drivePresenceStatus ^ currDrvStat).to_ulong());
+                uint32_t indexDrive = 0;
+                while (tmpVar > 0)
+                {
+                    if (tmpVar & 1)
+                    {
+                        if (drivePresenceStatus[indexDrive] == 0)
+                        {
+                            logDeviceAdded("Drive", std::to_string(indexDrive),
+                                           "N/A");
+                        }
+                        else
+                        {
+                            logDeviceRemoved("Drive",
+                                             std::to_string(indexDrive), "N/A");
+                        }
+                    }
+                    indexDrive++;
+                    tmpVar >>= 1;
+                }
+                // update global drive presence for next time comparison
+                drivePresenceStatus = currDrvStat;
+            }
+            // false alarm
+            else
+            {
+                std::cerr << "False alarm detected by HSBP; no action taken \n";
+            }
+        }
+
+        // Step 2: disable or enable the pcie clock for corresponding drive
+        std::optional<int> tmpUpdStatus = updateClocksStatus(currDrvStat);
+        if (tmpUpdStatus.has_value())
+        {
+            if (tmpUpdStatus == -1)
+            {
+                std::cerr << "error: DB2000 register read issue "
+                          << "\n";
+            }
+        }
+        else
+        {
+            std::cerr << "error: DB2000 i2c access issue "
+                      << "\n";
+            close(hsbpFd);
+        }
+    }
+
+    nvmeLvc3AlertEvent.async_wait(
+        boost::asio::posix::stream_descriptor::wait_read,
+        [](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cerr << "nvmealert handler error: " << ec.message()
+                          << "\n";
+                return;
+            }
+            nvmeLvc3AlertHandler();
+        });
+}
+
 int main()
 {
     boost::asio::steady_timer callbackTimer(io);
@@ -1095,6 +1477,16 @@ int main()
             });
         });
 
+    cpldReadingInit();
+
+    if (!hsbpRequestAlertGpioEvents("FM_SMB_BMC_NVME_LVC3_ALERT_N",
+                                    nvmeLvc3AlertHandler, nvmeLvc3AlertLine,
+                                    nvmeLvc3AlertEvent))
+    {
+        std::cerr << "error: Unable to monitor events on HSBP Alert line "
+                  << "\n";
+    }
+
     auto iface =
         objServer.add_interface("/xyz/openbmc_project/inventory/item/storage",
                                 "xyz.openbmc_project.inventory.item.storage");
@@ -1102,4 +1494,5 @@ int main()
     io.post([]() { populate(); });
     setupPowerMatch(conn);
     io.run();
+    close(hsbpFd);
 }
