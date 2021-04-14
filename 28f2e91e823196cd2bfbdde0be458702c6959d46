@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6596fe29_33da8877",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4115fca1_32613a82",
+      "range": {
+        "startLine": 1053,
+        "startChar": 0,
+        "endLine": 1053,
+        "endChar": 35
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "be44584c_5474af24",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "216fcafe_e403800d",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1147,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be44584c_5474af24",
+      "range": {
+        "startLine": 1120,
+        "startChar": 0,
+        "endLine": 1147,
+        "endChar": 29
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "707dc417_f8c8a4b3",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1149,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcb215d9_02d737db",
+      "range": {
+        "startLine": 1149,
+        "startChar": 7,
+        "endLine": 1149,
+        "endChar": 9
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "245786f8_e5f6b80e",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -91,6 +163,30 @@
       "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e861c0c3_1fc2d52f",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1151,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "This function was only used for debug purpose. Actual clocks updation is dependent on only the drive presence not on the prev value of clocks. Thus removing this function to optimize code.",
+      "parentUuid": "245786f8_e5f6b80e",
+      "range": {
+        "startLine": 1151,
+        "startChar": 4,
+        "endLine": 1151,
+        "endChar": 8
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "4136d782_409ddab1",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1152,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "577ac47e_ae6e4622",
+      "range": {
+        "startLine": 1152,
+        "startChar": 15,
+        "endLine": 1152,
+        "endChar": 29
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fd1a82a5_77c88344",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -137,6 +257,30 @@
       "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1cd37139_2c22950a",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1161,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Not needed as the function is removed. However used in another function.",
+      "parentUuid": "fd1a82a5_77c88344",
+      "range": {
+        "startLine": 1161,
+        "startChar": 8,
+        "endLine": 1161,
+        "endChar": 30
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "f4cbb536_a2346a93",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1180,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Function removed as such.",
+      "parentUuid": "ccbf666e_0ba2fb4d",
+      "range": {
+        "startLine": 1180,
+        "startChar": 34,
+        "endLine": 1180,
+        "endChar": 35
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2620e922_1d2122de",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -183,6 +351,30 @@
       "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c7548fd_6a24897f",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1189,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Function removed.",
+      "parentUuid": "2620e922_1d2122de",
+      "range": {
+        "startLine": 1189,
+        "startChar": 34,
+        "endLine": 1189,
+        "endChar": 36
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -209,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "fdbca81f_84bbf619",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1196,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9c4c120_1bc6caf2",
+      "range": {
+        "startLine": 1196,
+        "startChar": 5,
+        "endLine": 1196,
+        "endChar": 25
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2f01667b_0df05a52",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -220,6 +436,30 @@
       "writtenOn": "2021-04-14T11:00:37Z",
       "side": 1,
       "message": "Nit: u_long definition could be architecture specific. May be we can extract out the required bytes outside and pass it here?\n\nuint8_t byte0 \u003d nvmeClockStatus \u0026 0xFF;\nuint8_t byte1 \u003d (nvmeClockStatus \u003e\u003e 8) \u0026 0xFF;\n...",
+      "range": {
+        "startLine": 1219,
+        "startChar": 63,
+        "endLine": 1219,
+        "endChar": 71
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "162e9e0f_c1a48cfd",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1219,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Min value of uLong is guranteed to be (2^32-1) or greater by cpp standard. Considering server platforms with 64bit datawidth it shall never go out of range.\nLet me know if you still feel the need to change implementation.",
+      "parentUuid": "2f01667b_0df05a52",
       "range": {
         "startLine": 1219,
         "startChar": 63,
@@ -255,6 +495,30 @@
     },
     {
       "key": {
+        "uuid": "9e2d3cde_f2701bab",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1388,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Changed at all places.",
+      "parentUuid": "79440dab_c3f0be05",
+      "range": {
+        "startLine": 1388,
+        "startChar": 9,
+        "endLine": 1388,
+        "endChar": 19
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63d54313_b2e6b6e4",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 1
@@ -275,6 +539,30 @@
       "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8648827_a42263b1",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1519,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-14T17:36:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "63d54313_b2e6b6e4",
+      "range": {
+        "startLine": 1519,
+        "startChar": 8,
+        "endLine": 1519,
+        "endChar": 18
+      },
+      "revId": "28f2e91e823196cd2bfbdde0be458702c6959d46",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
