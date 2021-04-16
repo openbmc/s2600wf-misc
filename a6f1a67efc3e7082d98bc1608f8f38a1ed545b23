@@ -1,0 +1,257 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0967014a_ec5a0570",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "Here too. Please review the entire file and fix the casing issues",
+      "range": {
+        "startLine": 52,
+        "startChar": 45,
+        "endLine": 52,
+        "endChar": 66
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b2d5d2ac_1add0b68",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1121,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "nit: can we give a more specific name here? hsbpCpldFd or something?",
+      "range": {
+        "startLine": 1121,
+        "startChar": 4,
+        "endLine": 1121,
+        "endChar": 9
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8b3bdc8_5f002214",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "cpldReadingInit",
+      "range": {
+        "startLine": 1312,
+        "startChar": 5,
+        "endLine": 1312,
+        "endChar": 22
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46b7fd39_cc01c661",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "nit: camelCase",
+      "range": {
+        "startLine": 1351,
+        "startChar": 12,
+        "endLine": 1351,
+        "endChar": 35
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98be4a1d_d4c7d0da",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1355,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "nvmeAlert. Also, a nit: you could simply do a\n\nif(Nvme_Lvc3_Alert_line.event_read() \u003d\u003d gpiod::line_event::FALLING_EDGE)\n{\n...\n\n}",
+      "range": {
+        "startLine": 1355,
+        "startChar": 9,
+        "endLine": 1355,
+        "endChar": 18
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8b43e48_21d2172d",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1369,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "In case of false alarm, don\u0027t we have to block rest of the statements in this code block from executing?\n\nprobably do a \nif(drivePresenceStatus !\u003d currDriveStatus) {\n\n//...execute logic\n\n}\n\nelse {\n   //log false alarm\n}",
+      "range": {
+        "startLine": 1369,
+        "startChar": 16,
+        "endLine": 1369,
+        "endChar": 79
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "636b2768_6a88ac3e",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "nit: we could use uin32_t to be explicitly 32 bit",
+      "range": {
+        "startLine": 1371,
+        "startChar": 12,
+        "endLine": 1371,
+        "endChar": 24
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7e2656d_d20b32d6",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "uint32_t",
+      "range": {
+        "startLine": 1371,
+        "startChar": 46,
+        "endLine": 1371,
+        "endChar": 49
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76cf48f4_da4a9878",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1385,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "This logic misses if 2 or more drives are inserted/removed simultaneously, no? This could happen considering the fact that this is a single threaded application and there could be latencies in processing the GPIO alert line.\n\nwhile (tmpVar \u003e 0)\n{\n   if(tmpVar \u0026 1)\n   {\n       if (DrivePresenceStatus[indexDrive] \u003d\u003d 0)\n       {\n           logDeviceAdded(\"Drive\", std::to_string(indexDrive), \"N/A\");\n       }\n       else\n       {\n           logDeviceRemoved(\"Drive\", std::to_string(indexDrive), \"N/A\");\n       }\n   }\n   indexDrive++;\n   tmpVar \u003e\u003e\u003d 1;\n}",
+      "range": {
+        "startLine": 1373,
+        "startChar": 12,
+        "endLine": 1385,
+        "endChar": 13
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92810054_ed9ce6db",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1399,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "If we close the file here, the future reads using updateClockStatus() are always going to fail. close(file) is not required here.",
+      "range": {
+        "startLine": 1399,
+        "startChar": 15,
+        "endLine": 1399,
+        "endChar": 28
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "717af2cd_44851a21",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1481,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-16T03:04:22Z",
+      "side": 1,
+      "message": "nit: Shouldn\u0027t this be - unable to monitor events on HSBP Alert line ?",
+      "range": {
+        "startLine": 1481,
+        "startChar": 39,
+        "endLine": 1481,
+        "endChar": 47
+      },
+      "revId": "a6f1a67efc3e7082d98bc1608f8f38a1ed545b23",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
