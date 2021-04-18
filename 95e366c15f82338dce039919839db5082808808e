@@ -143,6 +143,23 @@
     },
     {
       "key": {
+        "uuid": "e8efcb19_6986ac05",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1114,
+      "author": {
+        "id": 1000418
+      },
+      "writtenOn": "2021-04-18T17:17:47Z",
+      "side": 1,
+      "message": "Avoid macros whereever possible. Use constexpr.\nhttps://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#es31-dont-use-macros-for-constants-or-functions",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "35f6ab0a_7fd16fc0",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 4
@@ -375,6 +392,40 @@
       "revId": "95e366c15f82338dce039919839db5082808808e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "25ae5c16_a165a80d",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1314,
+      "author": {
+        "id": 1000418
+      },
+      "writtenOn": "2021-04-18T17:17:47Z",
+      "side": 1,
+      "message": "If you want to initialize with 0, prefer {}\ni.e.) bitset\u003cALL_CLOCK_BITS_DB2000\u003e clockStatus{0};\n\nhttps://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#es23-prefer-the--initializer-syntax",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad0b9e46_bce42f58",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1315,
+      "author": {
+        "id": 1000418
+      },
+      "writtenOn": "2021-04-18T17:17:47Z",
+      "side": 1,
+      "message": "nit: You can create some I2C wrappers inspired from here:\nhttps://github.com/openbmc/pfr-manager/blob/master/libpfr/inc/file.hpp\n\nThis will simplify the code and error handling.",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
