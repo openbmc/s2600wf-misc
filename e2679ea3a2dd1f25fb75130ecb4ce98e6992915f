@@ -49,6 +49,29 @@
     },
     {
       "key": {
+        "uuid": "0a758d05_4cec4698",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "is this always the same? \nAlso, avoid using MACROS",
+      "range": {
+        "startLine": 1108,
+        "startChar": 0,
+        "endLine": 1108,
+        "endChar": 21
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b59ba21c_efff158f",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -65,6 +88,305 @@
         "startChar": 0,
         "endLine": 1116,
         "endChar": 10
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "538a400a_f2bf10b9",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "Are these always the same for all systems?",
+      "range": {
+        "startLine": 1118,
+        "startChar": 0,
+        "endLine": 1120,
+        "endChar": 47
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9524aa12_310ad913",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "is this used anywhere?",
+      "range": {
+        "startLine": 1123,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 0
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92ac3aca_a574242f",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1165,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "constexpr",
+      "range": {
+        "startLine": 1163,
+        "startChar": 0,
+        "endLine": 1165,
+        "endChar": 62
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b5541fd_b9160155",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "this does not look right, it skips the last bit.\nAs I read again, looks like the highest bit is some sort of a flag. So this maybe correct - but please add comments since it looks odd and the reason is is not obvious.",
+      "range": {
+        "startLine": 1167,
+        "startChar": 28,
+        "endLine": 1167,
+        "endChar": 60
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "768ac816_a8c02ad1",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "please static_assert slotToClockTable size \u003d\u003d ALL_DRIVES_WITH_STATUS_BIT",
+      "range": {
+        "startLine": 1171,
+        "startChar": 32,
+        "endLine": 1171,
+        "endChar": 51
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "481b948e_51768c12",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "test for \u003e0 ?\nOther places too",
+      "range": {
+        "startLine": 1179,
+        "startChar": 14,
+        "endLine": 1179,
+        "endChar": 20
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17a652b2_8920a808",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1186,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "magic number\nother places too",
+      "range": {
+        "startLine": 1186,
+        "startChar": 16,
+        "endLine": 1186,
+        "endChar": 20
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fcb86b9_33b094a3",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1255,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "for (int loop\u003d0;",
+      "range": {
+        "startLine": 1253,
+        "startChar": 4,
+        "endLine": 1255,
+        "endChar": 17
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57e913eb_2f8e72c3",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1255,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "magic number",
+      "range": {
+        "startLine": 1255,
+        "startChar": 26,
+        "endLine": 1255,
+        "endChar": 27
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "339cbdff_af8ecb80",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1258,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "extra ()",
+      "range": {
+        "startLine": 1258,
+        "startChar": 55,
+        "endLine": 1258,
+        "endChar": 69
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9afae41_fbde2601",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1258,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "logic does not look right - or can be simplified",
+      "range": {
+        "startLine": 1258,
+        "startChar": 11,
+        "endLine": 1258,
+        "endChar": 76
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0dc495db_2b2c9a56",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1319,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "should return.\nhsbpFd is still used, for example inside line 1320",
+      "range": {
+        "startLine": 1316,
+        "startChar": 4,
+        "endLine": 1319,
+        "endChar": 5
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8441e89a_c6603b4d",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1328,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-04-19T23:55:01Z",
+      "side": 1,
+      "message": "should set hsbpFd \u003d 0 after closing\nother places too",
+      "range": {
+        "startLine": 1328,
+        "startChar": 8,
+        "endLine": 1328,
+        "endChar": 22
       },
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
