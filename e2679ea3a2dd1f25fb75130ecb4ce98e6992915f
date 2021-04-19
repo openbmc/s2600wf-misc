@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "64a65c86_acbc79fe",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-04-19T13:26:16Z",
+      "side": 1,
+      "message": "This is to avoid namespace pollution, check https://softwareengineering.stackexchange.com/questions/236404/what-is-using-namespace-pollution",
+      "parentUuid": "edf759d6_cf086f6b",
+      "range": {
+        "startLine": 1107,
+        "startChar": 0,
+        "endLine": 1107,
+        "endChar": 18
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b59ba21c_efff158f",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
