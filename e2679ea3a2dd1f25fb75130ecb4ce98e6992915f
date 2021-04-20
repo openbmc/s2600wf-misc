@@ -391,6 +391,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c2b7e57_25cc9244",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1328,
+      "author": {
+        "id": 1000166
+      },
+      "writtenOn": "2021-04-20T16:53:40Z",
+      "side": 1,
+      "message": "0 is also a valid fd so assigning -1 is correct.",
+      "parentUuid": "8441e89a_c6603b4d",
+      "range": {
+        "startLine": 1328,
+        "startChar": 8,
+        "endLine": 1328,
+        "endChar": 22
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
