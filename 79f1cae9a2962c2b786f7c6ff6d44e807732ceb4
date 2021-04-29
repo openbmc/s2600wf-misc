@@ -22,6 +22,30 @@
       "revId": "79f1cae9a2962c2b786f7c6ff6d44e807732ceb4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8755deed_d919c9db",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T21:01:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb67762e_e8efa5e8",
+      "range": {
+        "startLine": 1329,
+        "startChar": 4,
+        "endLine": 1331,
+        "endChar": 5
+      },
+      "revId": "79f1cae9a2962c2b786f7c6ff6d44e807732ceb4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
