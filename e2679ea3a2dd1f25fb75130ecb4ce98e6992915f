@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "571066c3_e9c10d16",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "To avoid confusion using fully resolved name now.",
+      "parentUuid": "64a65c86_acbc79fe",
+      "range": {
+        "startLine": 1107,
+        "startChar": 0,
+        "endLine": 1107,
+        "endChar": 18
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a758d05_4cec4698",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -69,6 +93,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "300a4bf8_842952c2",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Yes, although it\u0027ll be made independent by including a node in entity manager and once FRU for HSBP gets implemented. It\u0027ll be taken care in the enhancement task.\n\nAll references to macros changed to constexpr.",
+      "parentUuid": "0a758d05_4cec4698",
+      "range": {
+        "startLine": 1108,
+        "startChar": 0,
+        "endLine": 1108,
+        "endChar": 21
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -95,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "c9f40450_8a4ee39c",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Using fully resolved names to avoid confusion.",
+      "parentUuid": "b59ba21c_efff158f",
+      "range": {
+        "startLine": 1116,
+        "startChar": 0,
+        "endLine": 1116,
+        "endChar": 10
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "538a400a_f2bf10b9",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -115,6 +187,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ebee141b_12f4817e",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Yes. Same applies as explained in prev comment for hsbpI2cBus \u003d4, line 1108.",
+      "parentUuid": "538a400a_f2bf10b9",
+      "range": {
+        "startLine": 1118,
+        "startChar": 0,
+        "endLine": 1120,
+        "endChar": 47
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -141,6 +237,30 @@
     },
     {
       "key": {
+        "uuid": "d25098c0_8eacfd0b",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "9524aa12_310ad913",
+      "range": {
+        "startLine": 1123,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 0
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92ac3aca_a574242f",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -161,6 +281,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a3e5820_25bfbf83",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1165,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92ac3aca_a574242f",
+      "range": {
+        "startLine": 1163,
+        "startChar": 0,
+        "endLine": 1165,
+        "endChar": 62
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -187,6 +331,30 @@
     },
     {
       "key": {
+        "uuid": "8c09c68c_18f0fefd",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b5541fd_b9160155",
+      "range": {
+        "startLine": 1167,
+        "startChar": 28,
+        "endLine": 1167,
+        "endChar": 60
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "768ac816_a8c02ad1",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -210,6 +378,30 @@
     },
     {
       "key": {
+        "uuid": "63917529_93dc89d2",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "768ac816_a8c02ad1",
+      "range": {
+        "startLine": 1171,
+        "startChar": 32,
+        "endLine": 1171,
+        "endChar": 51
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "481b948e_51768c12",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -221,6 +413,30 @@
       "writtenOn": "2021-04-19T23:55:01Z",
       "side": 1,
       "message": "test for \u003e0 ?\nOther places too",
+      "range": {
+        "startLine": 1179,
+        "startChar": 14,
+        "endLine": 1179,
+        "endChar": 20
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50c199a5_84ff68c0",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Its standard way to interact with i2c-dev interface.\nhttps://www.kernel.org/doc/Documentation/i2c/dev-interface",
+      "parentUuid": "481b948e_51768c12",
       "range": {
         "startLine": 1179,
         "startChar": 14,
@@ -253,6 +469,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5622e5d_370ba7dd",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1186,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17a652b2_8920a808",
+      "range": {
+        "startLine": 1186,
+        "startChar": 16,
+        "endLine": 1186,
+        "endChar": 20
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -302,6 +542,54 @@
     },
     {
       "key": {
+        "uuid": "828dd6f6_5b13b813",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1255,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4fcb86b9_33b094a3",
+      "range": {
+        "startLine": 1253,
+        "startChar": 4,
+        "endLine": 1255,
+        "endChar": 17
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e36fe793_d0b21153",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1255,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57e913eb_2f8e72c3",
+      "range": {
+        "startLine": 1255,
+        "startChar": 26,
+        "endLine": 1255,
+        "endChar": 27
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "339cbdff_af8ecb80",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -345,6 +633,54 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "091949d7_4b43f9d0",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1258,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9afae41_fbde2601",
+      "range": {
+        "startLine": 1258,
+        "startChar": 11,
+        "endLine": 1258,
+        "endChar": 76
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f36d1996_eae070e5",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1258,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "removed extra (). Logic simplified. Comment added.",
+      "parentUuid": "339cbdff_af8ecb80",
+      "range": {
+        "startLine": 1258,
+        "startChar": 55,
+        "endLine": 1258,
+        "endChar": 69
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -395,6 +731,30 @@
     },
     {
       "key": {
+        "uuid": "a2e7ad21_375c6e29",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1319,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Noted. Instead of return status from init function, now we depend on successful fd opening by init fn. Gpio monitoring logic only starts if init successful.\n\nAlso, alert handler now checks if the fd is valid at top level, to take care of runtime issues.",
+      "parentUuid": "1ea17507_da23a3db",
+      "range": {
+        "startLine": 1316,
+        "startChar": 4,
+        "endLine": 1319,
+        "endChar": 5
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8441e89a_c6603b4d",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 5
@@ -439,6 +799,30 @@
       "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "58f5ba68_b798a3ef",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1328,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c2b7e57_25cc9244",
+      "range": {
+        "startLine": 1328,
+        "startChar": 8,
+        "endLine": 1328,
+        "endChar": 22
+      },
+      "revId": "e2679ea3a2dd1f25fb75130ecb4ce98e6992915f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }

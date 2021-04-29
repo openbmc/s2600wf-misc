@@ -160,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "57805dd2_c3692475",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1114,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8efcb19_6986ac05",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "35f6ab0a_7fd16fc0",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 4
@@ -412,6 +430,24 @@
     },
     {
       "key": {
+        "uuid": "79054b13_3aae8d95",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1314,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "removed initialization as per suggestion, as default constructor initializes to 0.",
+      "parentUuid": "25ae5c16_a165a80d",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad0b9e46_bce42f58",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 4
@@ -426,6 +462,24 @@
       "revId": "95e366c15f82338dce039919839db5082808808e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cef0c35_764867e7",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1315,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-04-29T12:59:07Z",
+      "side": 1,
+      "message": "As discussed, it\u0027ll be taken care in the enhancement task where we add entity manager node and/or HSBP Fru logic.",
+      "parentUuid": "ad0b9e46_bce42f58",
+      "revId": "95e366c15f82338dce039919839db5082808808e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
