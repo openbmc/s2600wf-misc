@@ -1,0 +1,216 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ed9b7eab_ec11986b",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1087,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "Is the idea here that you will see this get handled only once? This async_wait will fire on the first read, but if you want to be notified on the following events, you will need to call async_wait again.\n\nYou might consider making this portion (the call and the immediate lambda callback) a function call in and of itself. Then hsbpRequestAlertGpioEvents can call it initially to arm it the first time, but then it can call itself from within the lambda to arm it for future events.",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "450eb2ab_e8668736",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1117,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "should these be static?",
+      "range": {
+        "startLine": 1116,
+        "startChar": 0,
+        "endLine": 1117,
+        "endChar": 49
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1594a296_23414239",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "static in hsbpFd \u003d -1;\n\n0 is a valid FD, so it should not be allowed to default to that.",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f28263f1_92915e31",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1161,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "this should be declared where it is first used.",
+      "range": {
+        "startLine": 1161,
+        "startChar": 0,
+        "endLine": 1161,
+        "endChar": 12
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eaadebc6_d3f8f2d3",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1164,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "if you make this a constexpr std::array\u003cint, statusAllDrives\u003e, the size is built in and the compiler will throw an error automatically if the number of entries does not match the size specified. The you don\u0027t need to have the static_assert below.",
+      "range": {
+        "startLine": 1164,
+        "startChar": 4,
+        "endLine": 1164,
+        "endChar": 36
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2403e38_ae2c3ac9",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1231,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "these should be declared where they are first used.",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1231,
+        "endChar": 29
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14a839e2_461babf6",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1285,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "these should be declared where they are used (in the loops)",
+      "range": {
+        "startLine": 1285,
+        "startChar": 0,
+        "endLine": 1285,
+        "endChar": 13
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "149c8385_17863a4c",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1323,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "this is not used",
+      "range": {
+        "startLine": 1323,
+        "startChar": 0,
+        "endLine": 1323,
+        "endChar": 48
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63955e61_635ebe1a",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1355,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "it seems like this logic could be inverted to return early on success and then always close(hsbpFd)/hsbpFd\u003d-1 for all errors at the end of the function.",
+      "range": {
+        "startLine": 1338,
+        "startChar": 1,
+        "endLine": 1355,
+        "endChar": 24
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e69764d_0dfabc5f",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1418,
+      "author": {
+        "id": 1000163
+      },
+      "writtenOn": "2021-05-10T22:04:32Z",
+      "side": 1,
+      "message": "close(hsbpFd)?",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
