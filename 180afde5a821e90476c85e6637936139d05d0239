@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f1bcb205_e889115a",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1087,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "First time async_wait calls the handler(nvmeLvc3AlertHandler) and then onwards retriggering async_wait is done in handler after processing the event. The construct is taken as it is from host-error-monitor",
+      "parentUuid": "ed9b7eab_ec11986b",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "450eb2ab_e8668736",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 8
@@ -30,6 +48,30 @@
       "writtenOn": "2021-05-10T22:04:32Z",
       "side": 1,
       "message": "should these be static?",
+      "range": {
+        "startLine": 1116,
+        "startChar": 0,
+        "endLine": 1117,
+        "endChar": 49
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b0c6e5d_745a2ebf",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1117,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Left it global in case someone from outside the file wants to access these two. But on a second thought lets keep them static as suggested by you, unless such requirement arises.",
+      "parentUuid": "450eb2ab_e8668736",
       "range": {
         "startLine": 1116,
         "startChar": 0,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "e7b6d80c_4af7f016",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "That was my understanding too. But based on a review comment to save cpu cycles left it uninitialized.\nThe first call in init function(cpldReadingInit) is the open call, and before that we do not use this variable. So whether or not we init the variable it\u0027ll get a value from the open call.",
+      "parentUuid": "1594a296_23414239",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f28263f1_92915e31",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 8
@@ -79,6 +139,30 @@
       "revId": "180afde5a821e90476c85e6637936139d05d0239",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c80e19cb_c4fd721c",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1161,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f28263f1_92915e31",
+      "range": {
+        "startLine": 1161,
+        "startChar": 0,
+        "endLine": 1161,
+        "endChar": 12
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -105,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "475a0775_edd1d644",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1164,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eaadebc6_d3f8f2d3",
+      "range": {
+        "startLine": 1164,
+        "startChar": 4,
+        "endLine": 1164,
+        "endChar": 36
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2403e38_ae2c3ac9",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 8
@@ -125,6 +233,30 @@
       "revId": "180afde5a821e90476c85e6637936139d05d0239",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1622e5be_b9e2610b",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1231,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2403e38_ae2c3ac9",
+      "range": {
+        "startLine": 1231,
+        "startChar": 0,
+        "endLine": 1231,
+        "endChar": 29
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -151,6 +283,30 @@
     },
     {
       "key": {
+        "uuid": "e4fdc005_46eedd9b",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1285,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14a839e2_461babf6",
+      "range": {
+        "startLine": 1285,
+        "startChar": 0,
+        "endLine": 1285,
+        "endChar": 13
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "149c8385_17863a4c",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 8
@@ -171,6 +327,30 @@
       "revId": "180afde5a821e90476c85e6637936139d05d0239",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5cb14e2d_a7b0ff44",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1323,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "149c8385_17863a4c",
+      "range": {
+        "startLine": 1323,
+        "startChar": 0,
+        "endLine": 1323,
+        "endChar": 48
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -197,6 +377,30 @@
     },
     {
       "key": {
+        "uuid": "727bfb04_d8efb9dc",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1355,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Logic has become a bit interlinked and complex due to one review comment which was to differentiate between DB2000 register read error and DB2000 i2c access issue. We are returning three types of return from updateClocksStatus and each error needs its own error message. At the moment can not think of a better logic.",
+      "parentUuid": "63955e61_635ebe1a",
+      "range": {
+        "startLine": 1338,
+        "startChar": 1,
+        "endLine": 1355,
+        "endChar": 24
+      },
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4e69764d_0dfabc5f",
         "filename": "hsbp-manager/src/hsbp_manager.cpp",
         "patchSetId": 8
@@ -211,6 +415,24 @@
       "revId": "180afde5a821e90476c85e6637936139d05d0239",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "305e5a87_651e107b",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1418,
+      "author": {
+        "id": 1000922
+      },
+      "writtenOn": "2021-05-11T19:23:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e69764d_0dfabc5f",
+      "revId": "180afde5a821e90476c85e6637936139d05d0239",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
