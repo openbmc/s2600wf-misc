@@ -99,7 +99,31 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
                                              warningVector);
 
     StatusSetting last = currentPriority;
+    std::vector<std::pair<std::string, std::variant<bool>>> ledsToSet;
+    if (forceRefresh)
+    {
+        ledsToSet.push_back(std::make_pair(fatalLedPath, false));
+        ledsToSet.push_back(std::make_pair(criticalLedPath, false));
+        ledsToSet.push_back(std::make_pair(warningLedPath, false));
+        ledsToSet.push_back(std::make_pair(okLedPath, false));
+        for (const auto& ledPair : ledsToSet)
+        {
 
+            conn->async_method_call(
+                [ledPair](const boost::system::error_code ec) {
+                    if (ec)
+                    {
+                        std::cerr << "Cannot set " << ledPair.first << " to "
+                                  << std::boolalpha
+                                  << std::get<bool>(ledPair.second) << "\n";
+                    }
+                },
+
+                ledManagerBusname, ledPair.first,
+                "org.freedesktop.DBus.Properties", "Set", ledIface,
+                ledAssertProp, ledPair.second);
+        }
+    }
     if (fatal)
     {
         currentPriority = StatusSetting::fatal;
@@ -116,8 +140,6 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
     {
         currentPriority = StatusSetting::ok;
     }
-
-    std::vector<std::pair<std::string, std::variant<bool>>> ledsToSet;
 
     if (last != currentPriority || forceRefresh)
     {
