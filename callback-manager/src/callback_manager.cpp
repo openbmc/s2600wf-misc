@@ -37,6 +37,11 @@ constexpr const char* ledAssertProp = "Asserted";
 constexpr const char* ledManagerBusname =
     "xyz.openbmc_project.LED.GroupManager";
 
+static constexpr const char* ledIntf = "xyz.openbmc_project.Led.Physical";
+static constexpr const char* ledBusPath = "xyz.openbmc_project.LED.Controller.";
+static constexpr const char* statusObjPath =
+    "/xyz/openbmc_project/led/physical/";
+
 std::unique_ptr<AssociationManager> associationManager;
 
 enum class StatusSetting
@@ -100,6 +105,57 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
 
     StatusSetting last = currentPriority;
 
+    if (forceRefresh)
+    {
+        std::variant<bool> updateState = false;
+        std::vector<std::pair<std::string, std::string>> ledsState;
+        ledsState.push_back(std::make_pair("status_green", warningLedPath));
+        ledsState.push_back(std::make_pair("status_green", okLedPath));
+        ledsState.push_back(std::make_pair("status_amber", criticalLedPath));
+        ledsState.push_back(std::make_pair("status_amber", fatalLedPath));
+        for (const auto& ledPair : ledsState)
+        {
+
+            conn->async_method_call(
+                [ledPair, &updateState](const boost::system::error_code ec,
+                                        const std::variant<std::string>& ret) {
+                    if (ec)
+                    {
+                        std::cerr << "Cannot get State" << ledPair.first
+                                  << "\n";
+                    }
+                    const std::string* state = std::get_if<std::string>(&ret);
+
+                    if (boost::ends_with(*state, "On"))
+                    {
+                        updateState = true;
+                    }
+                    else if (boost::ends_with(*state, "Blink"))
+                    {
+                        updateState = true;
+                    }
+                    else if (boost::ends_with(*state, "Off"))
+                    {
+                        updateState = false;
+                    }
+                },
+                ledBusPath + ledPair.first, statusObjPath + ledPair.first,
+                "org.freedesktop.DBus.Properties", "Get", ledIntf, "State");
+
+            conn->async_method_call(
+                [ledPair, updateState](const boost::system::error_code ec) {
+                    if (ec)
+                    {
+                        std::cerr << "Cannot set " << ledPair.second << " to "
+                                  << std::boolalpha
+                                  << std::get<bool>(updateState) << "\n";
+                    }
+                },
+                ledManagerBusname, ledPair.second,
+                "org.freedesktop.DBus.Properties", "Set", ledIface,
+                ledAssertProp, updateState);
+        }
+    }
     if (fatal)
     {
         currentPriority = StatusSetting::fatal;
