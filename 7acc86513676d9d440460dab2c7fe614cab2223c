@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aef85546_82abdd79",
+        "filename": "callback-manager/src/callback_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000416
+      },
+      "writtenOn": "2021-06-29T10:49:47Z",
+      "side": 1,
+      "message": "add debug log statement? refer line#193",
+      "revId": "7acc86513676d9d440460dab2c7fe614cab2223c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
