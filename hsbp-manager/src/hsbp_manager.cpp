@@ -1161,7 +1161,7 @@ std::optional<int>
     std::bitset<allClockBitsDb2000> nvmeClockStatus;
     /* mapping table for nvme drive index(0-15) to DB2000 register bit fields */
     constexpr std::array<int, statusAllDrives> slotToClockTable = {
-        8, 9, 10, 11, 23, 3, 4, 5, 19, 18, 20, 13, 17, 16, 15, 14};
+        19, 18, 20, 13, 17, 16, 15, 14, 8, 9, 10, 11, 23, 3, 4, 5};
 
     /* scan through all drives(except the status bit) and update corresponding
      * clock bit */
