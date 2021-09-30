@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53252102_35a76b17",
+        "filename": "callback-manager/src/callback_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1000416
+      },
+      "writtenOn": "2021-09-30T08:32:41Z",
+      "side": 1,
+      "message": "Please remove.",
+      "range": {
+        "startLine": 246,
+        "startChar": 16,
+        "endLine": 246,
+        "endChar": 74
+      },
+      "revId": "da065f02e218fb1bd9cbff297d65775cb4f7978f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
