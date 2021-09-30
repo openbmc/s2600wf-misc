@@ -211,17 +211,18 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
     static sdbusplus::bus::match::match match(
         static_cast<sdbusplus::bus::bus&>(*conn),
-        "type='signal',interface='org.freedesktop.DBus.Properties',"
-        "path_"
-        "namespace='/xyz/openbmc_project/"
-        "sensors',arg0namespace='xyz.openbmc_project.Sensor.Threshold'",
+        "type='signal',member='ThresholdAsserted'",
         [&conn](sdbusplus::message::message& message) {
-            std::string objectName;
-            boost::container::flat_map<std::string, std::variant<bool>> values;
+            std::string sensorName;
+            std::string thresholdInterface;
+            std::string event;
+            bool assert;
+            double assertValue;
 
             try
             {
-                message.read(objectName, values);
+                message.read(sensorName, thresholdInterface, event, assert,
+                             assertValue);
             }
             catch (sdbusplus::exception_t&)
             {
@@ -231,6 +232,27 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
             {
                 std::cerr << "Threshold callback " << message.get_path()
                           << "\n";
+            }
+
+            // Get the sensor threshold alarm
+            sdbusplus::message::message getThresholdAlarmValue =
+                conn->new_method_call(message.get_sender(), message.get_path(),
+                                      "org.freedesktop.DBus.Properties",
+                                      "GetAll");
+            getThresholdAlarmValue.append(thresholdInterface);
+            boost::container::flat_map<std::string, std::variant<bool>> values;
+            try
+            {
+                std::cerr << "CHALA in getSensorValue try.." << std::endl;
+                sdbusplus::message::message getThresholdAlarmValueResp =
+                    conn->call(getThresholdAlarmValue);
+                getThresholdAlarmValueResp.read(values);
+            }
+            catch (sdbusplus::exception_t&)
+            {
+                std::cerr << "error getting sensor value from "
+                          << message.get_path() << "\n";
+                return;
             }
 
             auto findCriticalLow = values.find("CriticalAlarmLow");
