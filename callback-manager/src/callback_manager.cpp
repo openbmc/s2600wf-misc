@@ -211,17 +211,18 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
     static sdbusplus::bus::match::match match(
         static_cast<sdbusplus::bus::bus&>(*conn),
-        "type='signal',interface='org.freedesktop.DBus.Properties',"
-        "path_"
-        "namespace='/xyz/openbmc_project/"
-        "sensors',arg0namespace='xyz.openbmc_project.Sensor.Threshold'",
+        "type='signal',member='ThresholdAsserted'",
         [&conn](sdbusplus::message::message& message) {
-            std::string objectName;
-            boost::container::flat_map<std::string, std::variant<bool>> values;
+            std::string sensorName;
+            std::string thresholdInterface;
+            std::string event;
+            bool assert = false;
+            double assertValue;
 
             try
             {
-                message.read(objectName, values);
+                message.read(sensorName, thresholdInterface, event, assert,
+                             assertValue);
             }
             catch (sdbusplus::exception_t&)
             {
@@ -233,31 +234,21 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
                           << "\n";
             }
 
-            auto findCriticalLow = values.find("CriticalAlarmLow");
-            auto findCriticalHigh = values.find("CriticalAlarmHigh");
-
-            auto findWarnLow = values.find("WarningAlarmLow");
-            auto findWarnHigh = values.find("WarningAlarmHigh");
-
-            if (findCriticalLow != values.end())
+            if (event == "CriticalAlarmLow")
             {
-                criticalAssertMap[message.get_path()]["Low"] =
-                    std::get<bool>(findCriticalLow->second);
+                criticalAssertMap[message.get_path()]["low"] = assert;
             }
-            if (findCriticalHigh != values.end())
+            else if (event == "CriticAlalarmHigh")
             {
-                criticalAssertMap[message.get_path()]["High"] =
-                    std::get<bool>(findCriticalHigh->second);
+                criticalAssertMap[message.get_path()]["high"] = assert;
             }
-            if (findWarnLow != values.end())
+            else if (event == "WarningAlarmLow")
             {
-                warningAssertMap[message.get_path()]["Low"] =
-                    std::get<bool>(findWarnLow->second);
+                warningAssertMap[message.get_path()]["low"] = assert;
             }
-            if (findWarnHigh != values.end())
+            else if (event == "WarningAlarmHigh")
             {
-                warningAssertMap[message.get_path()]["High"] =
-                    std::get<bool>(findWarnHigh->second);
+                warningAssertMap[message.get_path()]["high"] = assert;
             }
 
             associationManager->setSensorAssociations(
