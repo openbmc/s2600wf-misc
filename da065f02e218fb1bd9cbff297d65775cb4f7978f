@@ -49,6 +49,29 @@
     },
     {
       "key": {
+        "uuid": "fc90ee4a_d5596f5c",
+        "filename": "callback-manager/src/callback_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-10-05T23:01:53Z",
+      "side": 1,
+      "message": "I suspect these values can be used to simplify the below parsing logic. \nYou may not need another message call or at least simplify it",
+      "range": {
+        "startLine": 217,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 24
+      },
+      "revId": "da065f02e218fb1bd9cbff297d65775cb4f7978f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "53252102_35a76b17",
         "filename": "callback-manager/src/callback_manager.cpp",
         "patchSetId": 1
