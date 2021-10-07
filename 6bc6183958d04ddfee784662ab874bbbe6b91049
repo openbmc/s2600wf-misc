@@ -22,6 +22,30 @@
       "revId": "6bc6183958d04ddfee784662ab874bbbe6b91049",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f076efa9_233ad7a5",
+        "filename": "callback-manager/src/callback_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1000566
+      },
+      "writtenOn": "2021-10-07T03:50:13Z",
+      "side": 1,
+      "message": "We can use async_method_call as well here. However this implementation is removed in latest patch. Thank You",
+      "parentUuid": "600d8694_77b33cf9",
+      "range": {
+        "startLine": 239,
+        "startChar": 22,
+        "endLine": 239,
+        "endChar": 37
+      },
+      "revId": "6bc6183958d04ddfee784662ab874bbbe6b91049",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
