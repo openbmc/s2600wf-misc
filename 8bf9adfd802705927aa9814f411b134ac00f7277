@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a8aff29_b5f86e11",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000269
+      },
+      "writtenOn": "2021-10-18T12:22:36Z",
+      "side": 1,
+      "message": "Why only ADC sensors??",
+      "range": {
+        "startLine": 9,
+        "startChar": 11,
+        "endLine": 9,
+        "endChar": 22
+      },
+      "revId": "8bf9adfd802705927aa9814f411b134ac00f7277",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "08cb8be7_22048a2b",
+        "filename": "callback-manager/src/callback_manager.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1000269
+      },
+      "writtenOn": "2021-10-18T12:22:36Z",
+      "side": 1,
+      "message": "nit: For better debugging add assert, event \u0026 sensor Name( Can remove Path)",
+      "range": {
+        "startLine": 233,
+        "startChar": 16,
+        "endLine": 234,
+        "endChar": 34
+      },
+      "revId": "8bf9adfd802705927aa9814f411b134ac00f7277",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
