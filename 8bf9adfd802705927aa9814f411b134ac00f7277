@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "e118c903_03c8d6b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000559
+      },
+      "writtenOn": "2021-10-19T23:29:08Z",
+      "side": 1,
+      "message": "Only ADC sensors showed the symptom because they use powerDelay for checkThreshold, propertyChanged signals may not get emitted for de-assert.",
+      "parentUuid": "8bf2eda9_1aa37e3e",
+      "range": {
+        "startLine": 9,
+        "startChar": 11,
+        "endLine": 9,
+        "endChar": 22
+      },
+      "revId": "8bf9adfd802705927aa9814f411b134ac00f7277",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "08cb8be7_22048a2b",
         "filename": "callback-manager/src/callback_manager.cpp",
         "patchSetId": 3
