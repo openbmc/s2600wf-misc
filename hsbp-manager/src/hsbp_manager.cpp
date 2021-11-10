@@ -979,6 +979,7 @@ void populateMuxes(std::shared_ptr<boost::container::flat_set<Mux>> muxes,
 
 void populate()
 {
+    backplanes.clear();
     conn->async_method_call(
         [](const boost::system::error_code ec, const GetSubTreeType& subtree) {
             if (ec)
@@ -1004,7 +1005,6 @@ void populate()
                                       << ec2.message() << "\n";
                             return;
                         }
-                        backplanes.clear();
                         std::optional<size_t> bus;
                         std::optional<size_t> address;
                         std::optional<size_t> backplaneIndex;
