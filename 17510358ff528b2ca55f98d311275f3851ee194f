@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "84addf3e_7425a2a1",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 1000410
+      },
+      "writtenOn": "2021-11-10T19:19:22Z",
+      "side": 1,
+      "message": "Better to place the backplanes.clear() here. I believe the intention of populate() call is to populate the backplanes map with all available backplanes, thus having a backplanes.clear() at the beginning of the populate() is essential. (So, on repeated invocation of populate, we clear the backplanes\u0027 data and populate it cleanly)",
+      "revId": "17510358ff528b2ca55f98d311275f3851ee194f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
