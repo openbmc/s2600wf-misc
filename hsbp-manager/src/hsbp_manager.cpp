@@ -1004,7 +1004,6 @@ void populate()
                                       << ec2.message() << "\n";
                             return;
                         }
-                        backplanes.clear();
                         std::optional<size_t> bus;
                         std::optional<size_t> address;
                         std::optional<size_t> backplaneIndex;
