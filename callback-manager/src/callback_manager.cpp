@@ -239,7 +239,7 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
             {
                 criticalAssertMap[message.get_path()]["low"] = assert;
             }
-            else if (event == "CriticAlalarmHigh")
+            else if (event == "CriticalAlarmHigh")
             {
                 criticalAssertMap[message.get_path()]["high"] = assert;
             }
