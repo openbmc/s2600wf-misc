@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9ab8324_e5927300",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1000479
+      },
+      "writtenOn": "2021-12-03T06:18:23Z",
+      "side": 0,
+      "message": "This doesn\u0027t seems to be the right way. As general rule any resources we allocated as part of a class, we are supposed to clear when we exit(in destructor).\nBut here, we are knowingly allowing some copy of the shared_ptr class variable to remain even after deleting the class object.\n\nWhat if the new class object created another interface? the interface may get duplicated.\nOtherwise, if its a common interface and not associated to Backplane, then it doesn\u0027t need to a class variable for Backplane.",
+      "revId": "0c5059f685f6df0704a4b773f2e617cf10d03210",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
