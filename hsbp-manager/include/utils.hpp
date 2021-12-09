@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <iostream>
 #include <sdbusplus/asio/connection.hpp>
+#include <sdbusplus/bus/match.hpp>
 #include <string>
 #include <variant>
 #include <vector>
@@ -114,7 +115,7 @@ enum class registers : uint8_t
 
 } // namespace hsbp
 
-static std::unique_ptr<sdbusplus::bus::match::match> powerMatch = nullptr;
+static std::unique_ptr<sdbusplus::bus::match_t> powerMatch = nullptr;
 static bool powerStatusOn = false;
 
 bool isPowerOn(void)
@@ -136,7 +137,7 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
         return;
     }
 
-    powerMatch = std::make_unique<sdbusplus::bus::match::match>(
+    powerMatch = std::make_unique<sdbusplus::bus::match_t>(
         static_cast<sdbusplus::bus::bus&>(*conn),
         "type='signal',interface='" + std::string(properties::interface) +
             "',path='" + std::string(power::path) + "',arg0='" +
