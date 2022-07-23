@@ -209,10 +209,10 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
 void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 {
 
-    static sdbusplus::bus::match::match match(
-        static_cast<sdbusplus::bus::bus&>(*conn),
+    static sdbusplus::bus::match_t match(
+        static_cast<sdbusplus::bus_t&>(*conn),
         "type='signal',member='ThresholdAsserted'",
-        [&conn](sdbusplus::message::message& message) {
+        [&conn](sdbusplus::message_t& message) {
             std::string sensorName;
             std::string thresholdInterface;
             std::string event;
@@ -262,12 +262,12 @@ void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
 void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 {
-    static sdbusplus::bus::match::match match(
-        static_cast<sdbusplus::bus::bus&>(*conn),
+    static sdbusplus::bus::match_t match(
+        static_cast<sdbusplus::bus_t&>(*conn),
         "type='signal',interface='org.freedesktop.DBus.Properties',"
         "arg0namespace='" +
             std::string(associationIface) + "'",
-        [&conn](sdbusplus::message::message& message) {
+        [&conn](sdbusplus::message_t& message) {
             if (message.get_path() == rootPath)
             {
                 return; // it's us
