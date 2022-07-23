@@ -1455,11 +1455,11 @@ int main()
 
     conn->request_name(busName);
 
-    sdbusplus::bus::match::match match(
+    sdbusplus::bus::match_t match(
         *conn,
         "type='signal',member='PropertiesChanged',arg0='" +
             std::string(configType) + "'",
-        [&callbackTimer](sdbusplus::message::message&) {
+        [&callbackTimer](sdbusplus::message_t&) {
             callbackTimer.expires_after(std::chrono::seconds(2));
             callbackTimer.async_wait([](const boost::system::error_code ec) {
                 if (ec == boost::asio::error::operation_aborted)
@@ -1476,11 +1476,11 @@ int main()
             });
         });
 
-    sdbusplus::bus::match::match drive(
+    sdbusplus::bus::match_t drive(
         *conn,
         "type='signal',member='PropertiesChanged',arg0='xyz.openbmc_project."
         "Inventory.Item.NVMe'",
-        [&callbackTimer](sdbusplus::message::message& message) {
+        [&callbackTimer](sdbusplus::message_t& message) {
             callbackTimer.expires_after(std::chrono::seconds(2));
             if (message.get_sender() == conn->get_unique_name())
             {

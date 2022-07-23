@@ -138,11 +138,11 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
     }
 
     powerMatch = std::make_unique<sdbusplus::bus::match_t>(
-        static_cast<sdbusplus::bus::bus&>(*conn),
+        static_cast<sdbusplus::bus_t&>(*conn),
         "type='signal',interface='" + std::string(properties::interface) +
             "',path='" + std::string(power::path) + "',arg0='" +
             std::string(power::interface) + "'",
-        [](sdbusplus::message::message& message) {
+        [](sdbusplus::message_t& message) {
             std::string objectName;
             boost::container::flat_map<std::string, std::variant<std::string>>
                 values;
