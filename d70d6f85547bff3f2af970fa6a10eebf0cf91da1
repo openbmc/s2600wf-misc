@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b436c9a6_a226bb6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-07-25T12:46:14Z",
+      "side": 1,
+      "message": "Repo\u0027s cmake seems to be doing something that makes certain Jenkins instances unhappy.  There is no functional code change here and subsequent commits pass.  Forcing a +1 Verified on this.",
+      "revId": "d70d6f85547bff3f2af970fa6a10eebf0cf91da1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
