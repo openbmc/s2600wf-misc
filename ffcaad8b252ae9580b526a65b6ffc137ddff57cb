@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22461567_7ec29261",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-09-12T20:33:25Z",
+      "side": 1,
+      "message": "Maintainer has had plenty of time to weigh in on this trivial chain.",
+      "revId": "ffcaad8b252ae9580b526a65b6ffc137ddff57cb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
