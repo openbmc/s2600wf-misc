@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4c5c9b9_7093aca7",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1277,
+      "author": {
+        "id": 1001151
+      },
+      "writtenOn": "2023-01-06T08:59:16Z",
+      "side": 1,
+      "message": "In case you are only planning to traverse in one direction do you prefer std::forward_list here ?",
+      "range": {
+        "startLine": 1277,
+        "startChar": 4,
+        "endLine": 1277,
+        "endChar": 13
+      },
+      "revId": "c33b7a8f7274c7e0057be5cd3a2d2ae214a04dac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
