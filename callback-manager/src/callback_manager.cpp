@@ -16,7 +16,7 @@
 
 #include "callback_manager.hpp"
 
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_map.hpp>
 #include <sdbusplus/asio/connection.hpp>
@@ -351,7 +351,7 @@ void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 
 int main(int argc, char** argv)
 {
-    boost::asio::io_service io;
+    boost::asio::io_context io;
     auto conn = std::make_shared<sdbusplus::asio::connection>(io);
     conn->request_name("xyz.openbmc_project.CallbackManager");
     sdbusplus::asio::object_server objServer(conn);
