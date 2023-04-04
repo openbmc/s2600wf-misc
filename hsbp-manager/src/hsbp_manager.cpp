@@ -27,6 +27,7 @@
 #include <fstream>
 #include <gpiod.hpp>
 #include <iostream>
+#include <list>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
 #include <sdbusplus/bus/match.hpp>
