@@ -618,10 +618,14 @@ struct Led : std::enable_shared_from_this<Led>
     // work
     void createInterface(void)
     {
-        std::shared_ptr<Led> self = shared_from_this();
-
         ledInterface->register_property(
-            ledGroup::asserted, false, [self](const bool req, bool& val) {
+            ledGroup::asserted, false,
+            [weakRef{weak_from_this()}](const bool req, bool& val) {
+                auto self = weakRef.lock();
+                if (!self)
+                {
+                    return 0;
+                }
                 if (req == val)
                 {
                     return 1;
@@ -848,7 +852,7 @@ struct Backplane : std::enable_shared_from_this<Backplane>
     void populateAsset(const std::string& rootPath, const std::string& busname)
     {
         conn->async_method_call(
-            [assetIface{assetInterface}, hsbpIface{hsbpItemIface}](
+            [assetIface{assetInterface}](
                 const boost::system::error_code ec,
                 const boost::container::flat_map<
                     std::string, std::variant<std::string>>& values) mutable {
@@ -859,8 +863,6 @@ struct Backplane : std::enable_shared_from_this<Backplane>
 
                     return;
                 }
-                assetIface = objServer.add_interface(
-                    hsbpIface->get_object_path(), assetTag);
                 for (const auto& [key, value] : values)
                 {
                     const std::string* ptr = std::get_if<std::string>(&value);
@@ -923,6 +925,9 @@ struct Backplane : std::enable_shared_from_this<Backplane>
             "xyz.openbmc_project.Inventory.Item.StorageController");
         storageInterface->initialize();
 
+        assetInterface =
+            objServer.add_interface(hsbpItemIface->get_object_path(), assetTag);
+
         versionIface =
             objServer.add_interface("/xyz/openbmc_project/software/" + dbusName,
                                     "xyz.openbmc_project.Software.Version");
@@ -935,10 +940,9 @@ struct Backplane : std::enable_shared_from_this<Backplane>
                 "xyz.openbmc_project.Software.Version.VersionPurpose.HSBP"));
         versionIface->initialize();
 
-        auto activationIface =
+        activationIface =
             objServer.add_interface("/xyz/openbmc_project/software/" + dbusName,
                                     "xyz.openbmc_project.Software.Activation");
-
         activationIface->register_property(
             "Activation",
             std::string(
@@ -947,7 +951,6 @@ struct Backplane : std::enable_shared_from_this<Backplane>
             "RequestedActivation",
             std::string("xyz.openbmc_project.Software.Activation."
                         "RequestedActivations.None"));
-
         activationIface->initialize();
 
         getPresence(presence);
@@ -1251,6 +1254,7 @@ struct Backplane : std::enable_shared_from_this<Backplane>
         objServer.remove_interface(versionIface);
         objServer.remove_interface(storageInterface);
         objServer.remove_interface(assetInterface);
+        objServer.remove_interface(activationIface);
         if (file >= 0)
         {
             close(file);
@@ -1282,7 +1286,7 @@ struct Backplane : std::enable_shared_from_this<Backplane>
     std::shared_ptr<sdbusplus::asio::dbus_interface> versionIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> storageInterface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> assetInterface;
-
+    std::shared_ptr<sdbusplus::asio::dbus_interface> activationIface;
     std::list<Drive> drives;
     std::vector<std::shared_ptr<Led>> leds;
     std::shared_ptr<boost::container::flat_set<Mux>> muxes;
