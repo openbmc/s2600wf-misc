@@ -1,0 +1,10 @@
+Code-Review+2: Vernon Mauery <vernon.mauery@linux.intel.com>
+Code-Review+1: <akshay.raveendran.k@linux.intel.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Gokul Sanker V G <gokul.sanker.v.g@intel.com>
+Code-Review+1: <smriti.ayushi@linux.intel.com>
+Submitted-by: Arun Lal K M <arun.lal@intel.com>
+Submitted-at: Wed, 31 May 2023 13:36:57 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/63845
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
