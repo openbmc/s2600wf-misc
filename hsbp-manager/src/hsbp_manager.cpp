@@ -39,6 +39,7 @@ extern "C" {
 #include <linux/i2c-dev.h>
 }
 
+
 /****************************************************************************/
 /******************** Global Constants/Type Declarations ********************/
 /****************************************************************************/
@@ -168,6 +169,7 @@ class ClockBuffer
                 }
 
                 std::bitset<8> currByte(read);
+                bool writeRequired = false;
 
                 /* Set zero only at bit position that we have a NVMe drive (i.e.
                  * ignore where byteMap is "-"). We do not want to touch other
@@ -176,20 +178,25 @@ class ClockBuffer
                 {
                     if (byte->second.at(bit) != "-")
                     {
+                        writeRequired = true;
                         currByte.reset(bit);
                     }
                 }
 
-                int ret = i2c_smbus_write_byte_data(
-                    file, static_cast<uint8_t>(outCtrlBaseAddr + i),
-                    static_cast<uint8_t>(currByte.to_ulong()));
-
-                if (ret < 0)
+                if (writeRequired)
                 {
-                    std::cerr << "ClockBuffer : \"" << name
-                              << "\" - Error: Unable to write data to clock "
-                                 "buffer register\n";
-                    return;
+                    int ret = i2c_smbus_write_byte_data(
+                        file, static_cast<uint8_t>(outCtrlBaseAddr + i),
+                        static_cast<uint8_t>(currByte.to_ulong()));
+
+                    if (ret < 0)
+                    {
+                        std::cerr
+                            << "ClockBuffer : \"" << name
+                            << "\" - Error: Unable to write data to clock "
+                               "buffer register\n";
+                        return;
+                    }
                 }
             }
         }
@@ -394,6 +401,7 @@ class IoExpander
                 return;
             }
 
+            bool writeRequired = false;
             std::bitset<8> currCtrlVal(read1);
             std::bitset<8> currOutVal(read2);
 
@@ -404,31 +412,37 @@ class IoExpander
             {
                 if (io->second.at(bit) != "-")
                 {
+                    writeRequired = true;
                     currCtrlVal.reset(bit);
                     currOutVal.reset(bit);
                 }
             }
 
-            int ret1 = i2c_smbus_write_byte_data(
-                file, static_cast<uint8_t>(confIORegAddr + i),
-                static_cast<uint8_t>(currCtrlVal.to_ulong()));
-            if (ret1 < 0)
+            if (writeRequired)
             {
-                std::cerr << "IoExpander : \"" << name
-                          << "\" - Error: Unable to write data to IO expander "
-                             "IO control register\n";
-                return;
-            }
+                int ret1 = i2c_smbus_write_byte_data(
+                    file, static_cast<uint8_t>(confIORegAddr + i),
+                    static_cast<uint8_t>(currCtrlVal.to_ulong()));
+                if (ret1 < 0)
+                {
+                    std::cerr
+                        << "IoExpander : \"" << name
+                        << "\" - Error: Unable to write data to IO expander "
+                           "IO control register\n";
+                    return;
+                }
 
-            int ret2 = i2c_smbus_write_byte_data(
-                file, static_cast<uint8_t>(outCtrlBaseAddr + i),
-                static_cast<uint8_t>(currOutVal.to_ulong()));
-            if (ret2 < 0)
-            {
-                std::cerr << "IoExpander : \"" << name
-                          << "\" - Error: Unable to write data to IO expander "
-                             "IO output register\n";
-                return;
+                int ret2 = i2c_smbus_write_byte_data(
+                    file, static_cast<uint8_t>(outCtrlBaseAddr + i),
+                    static_cast<uint8_t>(currOutVal.to_ulong()));
+                if (ret2 < 0)
+                {
+                    std::cerr
+                        << "IoExpander : \"" << name
+                        << "\" - Error: Unable to write data to IO expander "
+                           "IO output register\n";
+                    return;
+                }
             }
         }
         initialized = true;
