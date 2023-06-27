@@ -63,5 +63,8 @@ endif ()
 
 set (SERVICE_FILES ${PROJECT_SOURCE_DIR}/service_files/callback-manager.service)
 
+find_package (PkgConfig REQUIRED)
+pkg_get_variable(SYSTEMD_SYSTEM_UNIT_DIR systemd systemdsystemunitdir)
+
 install (TARGETS callback-manager DESTINATION sbin)
-install (FILES ${SERVICE_FILES} DESTINATION /lib/systemd/system/)
+install (FILES ${SERVICE_FILES} DESTINATION "${SYSTEMD_SYSTEM_UNIT_DIR}")
