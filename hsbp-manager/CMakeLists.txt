@@ -3,12 +3,6 @@ set (BUILD_SHARED_LIBRARIES OFF)
 include (ExternalProject)
 set (CMAKE_CXX_STANDARD 20)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-if (NOT YOCTO) # to download gtest
-    include ("cmake/HunterGate.cmake")
-    huntergate (URL "https://github.com/ruslo/hunter/archive/v0.18.64.tar.gz"
-                SHA1 "baf9c8cc4f65306f0e442b5419967b4c4c04589a")
-endif ()
 
 project (hsbp-manager CXX)
 
@@ -68,11 +62,6 @@ if (NOT YOCTO)
 
     include_directories (SYSTEM ${CMAKE_BINARY_DIR}/boost-src)
     set (CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/boost-src ${CMAKE_PREFIX_PATH})
-
-    option (HUNTER_ENABLED "Enable hunter package pulling" ON)
-    hunter_add_package (GTest)
-
-    find_package (GTest CONFIG REQUIRED)
 endif ()
 
 add_definitions (-DBOOST_ERROR_CODE_HEADER_ONLY)
