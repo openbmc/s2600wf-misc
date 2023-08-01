@@ -116,11 +116,9 @@ class ClockBuffer
 
     void initialize()
     {
-        /* Execute below operation only when mode of operation is SMBus. By
-         * default the clock buffer is configured to follow OE pin output, so we
-         * need to set the output value to 0 to disable the clock outputs. If
+        /* Execute below operation only when mode of operation is SMBus. If
          * mode of operation is IO, then the IO value will determine the
-         * disable/enable of clock output */
+         * disable/enable of clock output. Open the Clock buffer device */
         if (modeOfOperation == "SMBus")
         {
             if (file < 0)
@@ -142,63 +140,8 @@ class ClockBuffer
                           << "\n";
                 return;
             }
-
-            for (uint8_t i = 0; i < outCtrlByteCount; i++)
-            {
-                std::string byteName = "Byte" + std::to_string(i);
-
-                auto byte = byteMap.find(byteName);
-                if (byte == byteMap.end())
-                {
-                    std::cerr << "ClockBuffer : \"" << name
-                              << "\" - Byte map error ! Unable to find "
-                              << byteName << "\n";
-                    return;
-                }
-
-                /* Get current value of output control register */
-                int read = i2c_smbus_read_byte_data(
-                    file, static_cast<uint8_t>(outCtrlBaseAddr + i));
-                if (read < 0)
-                {
-                    std::cerr << "ClockBuffer : \"" << name
-                              << "\" - Error: Unable to read data from clock "
-                                 "buffer register\n";
-                    return;
-                }
-
-                std::bitset<8> currByte(read);
-                bool writeRequired = false;
-
-                /* Set zero only at bit position that we have a NVMe drive (i.e.
-                 * ignore where byteMap is "-"). We do not want to touch other
-                 * bits */
-                for (uint8_t bit = 0; bit < 8; bit++)
-                {
-                    if (byte->second.at(bit) != "-")
-                    {
-                        writeRequired = true;
-                        currByte.reset(bit);
-                    }
-                }
-
-                if (writeRequired)
-                {
-                    int ret = i2c_smbus_write_byte_data(
-                        file, static_cast<uint8_t>(outCtrlBaseAddr + i),
-                        static_cast<uint8_t>(currByte.to_ulong()));
-
-                    if (ret < 0)
-                    {
-                        std::cerr
-                            << "ClockBuffer : \"" << name
-                            << "\" - Error: Unable to write data to clock "
-                               "buffer register\n";
-                        return;
-                    }
-                }
-            }
         }
+
         initialized = true;
         std::cerr << "ClockBuffer : \"" << name << "\" initialized\n";
     }
@@ -227,6 +170,79 @@ class ClockBuffer
             initialize();
         }
         return initialized;
+    }
+
+    bool disableClocks()
+    {
+        /* Execute below operation only when mode of operation is SMBus. By
+         * default the clock buffer is configured to follow OE pin output, so we
+         * need to set the output value to 0 to disable the clock outputs. If
+         * mode of operation is IO, then the IO value will determine the
+         * disable/enable of clock output */
+
+        if (modeOfOperation != "SMBus")
+        {
+            /* The clock is enabled using IO expander. No action needed from
+             * here */
+            return true;
+        }
+
+        for (uint8_t i = 0; i < outCtrlByteCount; i++)
+        {
+            std::string byteName = "Byte" + std::to_string(i);
+
+            auto byte = byteMap.find(byteName);
+            if (byte == byteMap.end())
+            {
+                std::cerr << "ClockBuffer : \"" << name
+                          << "\" - Byte map error ! Unable to find " << byteName
+                          << "\n";
+                return false;
+            }
+
+            /* Get current value of output control register */
+            int read = i2c_smbus_read_byte_data(
+                file, static_cast<uint8_t>(outCtrlBaseAddr + i));
+            if (read < 0)
+            {
+                std::cerr << "ClockBuffer : \"" << name
+                          << "\" - Error: Unable to read data from clock "
+                             "buffer register\n";
+                return false;
+            }
+
+            std::bitset<8> currByte(read);
+            bool writeRequired = false;
+
+            /* Set zero only at bit position that we have a NVMe drive (i.e.
+             * ignore where byteMap is "-"). We do not want to touch other
+             * bits */
+            for (uint8_t bit = 0; bit < 8; bit++)
+            {
+                if (byte->second.at(bit) != "-")
+                {
+                    writeRequired = true;
+                    currByte.reset(bit);
+                }
+            }
+
+            if (writeRequired)
+            {
+                int ret = i2c_smbus_write_byte_data(
+                    file, static_cast<uint8_t>(outCtrlBaseAddr + i),
+                    static_cast<uint8_t>(currByte.to_ulong()));
+
+                if (ret < 0)
+                {
+                    std::cerr << "ClockBuffer : \"" << name
+                              << "\" - Error: Unable to write data to clock "
+                                 "buffer register\n";
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     std::string getName()
@@ -344,8 +360,7 @@ class IoExpander
 
     void initialize()
     {
-        /* Initialize the IO expander Control register to configure the IO ports
-         * as outputs and set the output to low by default */
+        /* Open IO controller device */
         if (file < 0)
         {
             file = open(("/dev/i2c-" + std::to_string(bus)).c_str(),
@@ -365,6 +380,40 @@ class IoExpander
             return;
         }
 
+        initialized = true;
+        std::cerr << "IoExpander : \"" << name << "\" initialized\n";
+    }
+
+  public:
+    IoExpander(
+        size_t busIn, size_t addressIn, size_t confIORegAddrIn,
+        size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
+        std::unordered_map<std::string, std::vector<std::string>>& ioMapIn,
+        std::string& nameIn, std::string& typeIn) :
+        bus(busIn),
+        address(addressIn), confIORegAddr(confIORegAddrIn),
+        outCtrlBaseAddr(outCtrlBaseAddrIn),
+        outCtrlByteCount(outCtrlByteCountIn), ioMap(std::move(ioMapIn)),
+        name(std::move(nameIn)), type(std::move(typeIn))
+    {
+        initialize();
+    }
+
+    bool isInitialized()
+    {
+        if (!initialized)
+        {
+            /* There was an issue with the initialization of this component. Try
+             * to invoke initialization again */
+            initialize();
+        }
+        return initialized;
+    }
+
+    bool disableIO()
+    {
+        /* Initialize the IO expander Control register to configure the IO ports
+         * as outputs and set the output to low by default */
         for (uint8_t i = 0; i < outCtrlByteCount; i++)
         {
             std::string ioName = "IO" + std::to_string(i);
@@ -375,7 +424,7 @@ class IoExpander
                 std::cerr << "IoExpander : \"" << name
                           << "\" - IO map error ! Unable to find " << ioName
                           << "\n";
-                return;
+                return false;
             }
 
             /* Get current value of IO configuration register */
@@ -386,7 +435,7 @@ class IoExpander
                 std::cerr << "IoExpander : \"" << name
                           << "\" - Error: Unable to read data from io expander "
                              "IO control register\n";
-                return;
+                return false;
             }
 
             /* Get current value of IO Ouput register */
@@ -397,7 +446,7 @@ class IoExpander
                 std::cerr << "IoExpander : \"" << name
                           << "\" - Error: Unable to read data from io expander "
                              "IO output register\n";
-                return;
+                return false;
             }
 
             bool writeRequired = false;
@@ -428,7 +477,7 @@ class IoExpander
                         << "IoExpander : \"" << name
                         << "\" - Error: Unable to write data to IO expander "
                            "IO control register\n";
-                    return;
+                    return false;
                 }
 
                 int ret2 = i2c_smbus_write_byte_data(
@@ -440,38 +489,12 @@ class IoExpander
                         << "IoExpander : \"" << name
                         << "\" - Error: Unable to write data to IO expander "
                            "IO output register\n";
-                    return;
+                    return false;
                 }
             }
         }
-        initialized = true;
-        std::cerr << "IoExpander : \"" << name << "\" initialized\n";
-    }
 
-  public:
-    IoExpander(
-        size_t busIn, size_t addressIn, size_t confIORegAddrIn,
-        size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
-        std::unordered_map<std::string, std::vector<std::string>>& ioMapIn,
-        std::string& nameIn, std::string& typeIn) :
-        bus(busIn),
-        address(addressIn), confIORegAddr(confIORegAddrIn),
-        outCtrlBaseAddr(outCtrlBaseAddrIn),
-        outCtrlByteCount(outCtrlByteCountIn), ioMap(std::move(ioMapIn)),
-        name(std::move(nameIn)), type(std::move(typeIn))
-    {
-        initialize();
-    }
-
-    bool isInitialized()
-    {
-        if (!initialized)
-        {
-            /* There was an issue with the initialization of this component. Try
-             * to invoke initialization again */
-            initialize();
-        }
-        return initialized;
+        return true;
     }
 
     std::string getName()
@@ -1526,6 +1549,31 @@ void checkHsbpDrivesStatus()
      * next GPIO event if any */
     boost::asio::post(io, []() { scanHsbpDrives(hsbpDriveScanInProgress); });
 }
+
+void disableAllClocks()
+{
+    /* Loop through all clock buffers and try to disable all clocks (this will
+     * be done if the mode of operation of the clock buffer is SMBus) */
+    for (auto& clockBuffer : clockBuffers)
+    {
+        if (!clockBuffer.disableClocks())
+        {
+            std::cerr << "Error Occurred while diabling the clock in \""
+                      << clockBuffer.getName() << "\"\n";
+        }
+    }
+
+    /* Loop through all IO Controllers and try to update the output to disable
+     * all clocks */
+    for (auto& ioExpander : ioExpanders)
+    {
+        if (!ioExpander.disableIO())
+        {
+            std::cerr << "Error Occurred while disabling the IO in \""
+                      << ioExpander.getName() << "\"\n";
+        }
+    }
+}
 /***************************** End of Section *******************************/
 
 /****************************************************************************/
@@ -1872,6 +1920,11 @@ void populateHsbpBackplanes(
                  * process can start again */
                 appState = AppState::componentsLoaded;
                 std::cerr << __FUNCTION__ << ": No HSBPs Detected....\n";
+
+                /* Set the components to their default value. This will result
+                 * in diabling the clock outputs. As there are no drives
+                 * detected, all the Clocks can be disabled */
+                disableAllClocks();
                 return;
             }
 
