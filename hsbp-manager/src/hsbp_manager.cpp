@@ -2854,9 +2854,13 @@ int main()
     /* Set the Dbus name */
     conn->request_name(busName);
 
+    std::shared_ptr<sdbusplus::asio::dbus_interface> storageIface;
+
     /* Add interface for storage inventory */
-    objServer.add_interface("/xyz/openbmc_project/inventory/item/storage",
+    storageIface = objServer.add_interface("/xyz/openbmc_project/inventory/item/storage/hsbp/1",
                             "xyz.openbmc_project.inventory.item.storage");
+
+    storageIface->initialize();
 
     /* HSBP initializtion flow:
      * 1. Register GPIO event callback on FM_SMB_BMC_NVME_LVC3_ALERT_N line
