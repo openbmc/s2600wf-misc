@@ -108,6 +108,7 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
         ledsToSet.push_back(std::make_pair(okLedPath, false));
         for (const auto& ledPair : ledsToSet)
         {
+            std::ios_base::fmtflags originalFlags = std::cerr.flags();
             conn->async_method_call(
                 [ledPair](const boost::system::error_code ec) {
                     if (ec)
@@ -115,12 +116,14 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
                         std::cerr << "Cannot set " << ledPair.first << " to "
                                   << std::boolalpha
                                   << std::get<bool>(ledPair.second) << "\n";
+                        std::cerr.flags(originalFlags);
                     }
                     if constexpr (debug)
                     {
                         std::cerr << "Set " << ledPair.first << " to "
                                   << std::boolalpha
                                   << std::get<bool>(ledPair.second) << "\n";
+                        std::cerr.flags(originalFlags);
                     }
                 },
                 ledManagerBusname, ledPair.first,
