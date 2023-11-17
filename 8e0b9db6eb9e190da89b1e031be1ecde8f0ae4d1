@@ -1,0 +1,7 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Vernon Mauery <vernon.mauery@linux.intel.com>
+Submitted-by: Vernon Mauery <vernon.mauery@linux.intel.com>
+Submitted-at: Fri, 17 Nov 2023 19:25:09 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/67462
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
