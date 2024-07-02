@@ -2857,8 +2857,13 @@ int main()
     std::shared_ptr<sdbusplus::asio::dbus_interface> storageIface;
 
     /* Add interface for storage inventory */
+<<<<<<< PATCH SET (d35ff8 Updated Storage Inventory Interface in hsbp-manager)
+    objServer.add_interface("/xyz/openbmc_project/inventory/item/storage",
+                            "xyz.openbmc_project.Inventory.Item.Storage");
+=======
     storageIface = objServer.add_interface("/xyz/openbmc_project/inventory/item/storage/hsbp/1",
                             "xyz.openbmc_project.inventory.item.storage");
+>>>>>>> BASE      (373cf3 Add storage inventory support for hsbp-manager)
 
     storageIface->initialize();
 
