@@ -2856,7 +2856,7 @@ int main()
 
     /* Add interface for storage inventory */
     objServer.add_interface("/xyz/openbmc_project/inventory/item/storage",
-                            "xyz.openbmc_project.inventory.item.storage");
+                            "xyz.openbmc_project.Inventory.Item.Storage");
 
     /* HSBP initializtion flow:
      * 1. Register GPIO event callback on FM_SMB_BMC_NVME_LVC3_ALERT_N line
