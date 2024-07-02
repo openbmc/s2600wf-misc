@@ -2858,7 +2858,7 @@ int main()
 
     /* Add interface for storage inventory */
     storageIface = objServer.add_interface("/xyz/openbmc_project/inventory/item/storage/hsbp/1",
-                            "xyz.openbmc_project.inventory.item.storage");
+                                           "xyz.openbmc_project.Inventory.Item.Storage");
 
     storageIface->initialize();
 
