@@ -1,0 +1,9 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Vernon Mauery <vernon.mauery@linux.intel.com>
+Code-Review+1: Saravanan Palanisamy <saravanan.palanisamy@linux.intel.com>
+Submitted-by: <pavanx.kumar.martha@intel.com>
+Submitted-at: Wed, 17 Jul 2024 05:04:02 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/72543
+Comments-Total: 1
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
