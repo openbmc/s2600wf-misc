@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
 set (BUILD_SHARED_LIBRARIES OFF)
 include (ExternalProject)
-set (CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 23)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
