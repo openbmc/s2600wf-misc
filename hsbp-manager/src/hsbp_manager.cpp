@@ -1699,7 +1699,11 @@ void updateAssets()
                             {
                                 continue;
                             }
-                            assetInventory[key] = std::get<std::string>(value);
+                            if (std::holds_alternative<std::string>(value))
+                            {
+                                assetInventory[key] =
+                                    std::get<std::string>(value);
+                            }
                         }
 
                         Backplane* parent = nullptr;
@@ -2857,8 +2861,9 @@ int main()
     std::shared_ptr<sdbusplus::asio::dbus_interface> storageIface;
 
     /* Add interface for storage inventory */
-    storageIface = objServer.add_interface("/xyz/openbmc_project/inventory/item/storage/hsbp/1",
-                                           "xyz.openbmc_project.Inventory.Item.Storage");
+    storageIface = objServer.add_interface(
+        "/xyz/openbmc_project/inventory/item/storage/hsbp/1",
+        "xyz.openbmc_project.Inventory.Item.Storage");
 
     storageIface->initialize();
 
