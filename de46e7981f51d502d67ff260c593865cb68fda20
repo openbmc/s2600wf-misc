@@ -16,6 +16,23 @@
       "message": "LGTM",
       "revId": "de46e7981f51d502d67ff260c593865cb68fda20",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19e17830_bbd9b9e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000416
+      },
+      "writtenOn": "2025-05-21T12:56:50Z",
+      "side": 1,
+      "message": "Hi @vernon.mauery@gmail.com, requesting you to review and approve this change.",
+      "revId": "de46e7981f51d502d67ff260c593865cb68fda20",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
