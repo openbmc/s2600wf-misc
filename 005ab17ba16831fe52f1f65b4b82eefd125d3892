@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64268cbf_c18b1ba7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-06-10T13:21:38Z",
+      "side": 1,
+      "message": "This change has been open for a few weeks with no feedback and doesn\u0027t change functionality, so going ahead with merge.",
+      "revId": "005ab17ba16831fe52f1f65b4b82eefd125d3892",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
