@@ -118,9 +118,9 @@ class ClockBuffer
     {
         /* Execute below operation only when mode of operation is SMBus. By
          * default the clock buffer is configured to follow OE pin output, so we
-         * need to set the output value to 0 to disable the clock outputs. If
-         * mode of operation is IO, then the IO value will determine the
-         * disable/enable of clock output */
+         * need to set the output value to 0 to disable the clock outputs and 1
+         * to enable clock output. If mode of operation is IO, then the IO value
+         * will determine the disable/enable of clock output */
         if (modeOfOperation == "SMBus")
         {
             if (file < 0)
@@ -170,7 +170,7 @@ class ClockBuffer
                 std::bitset<8> currByte(read);
                 bool writeRequired = false;
 
-                /* Set zero only at bit position that we have a NVMe drive (i.e.
+                /* Set 0/1 only at bit position that we have a NVMe drive (i.e.
                  * ignore where byteMap is "-"). We do not want to touch other
                  * bits */
                 for (uint8_t bit = 0; bit < 8; bit++)
@@ -178,7 +178,12 @@ class ClockBuffer
                     if (byte->second.at(bit) != "-")
                     {
                         writeRequired = true;
-                        currByte.reset(bit);
+                        /* Default to enabling the clock output and once the
+                         * HSBP's are detected the clocks will be
+                         * enabled/disabled depending on the drive status */
+                        /* TODO: This code might require a re-visit in case of
+                         * any signal integrity issues in the future */
+                        currByte.set(bit);
                     }
                 }
 
@@ -209,8 +214,8 @@ class ClockBuffer
         size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
         std::unordered_map<std::string, std::vector<std::string>>& byteMapIn,
         std::string& nameIn, std::string& typeIn) :
-        bus(busIn),
-        address(addressIn), modeOfOperation(std::move(modeOfOperationIn)),
+        bus(busIn), address(addressIn),
+        modeOfOperation(std::move(modeOfOperationIn)),
         outCtrlBaseAddr(outCtrlBaseAddrIn),
         outCtrlByteCount(outCtrlByteCountIn), byteMap(std::move(byteMapIn)),
         name(std::move(nameIn)), type(std::move(typeIn))
@@ -345,7 +350,7 @@ class IoExpander
     void initialize()
     {
         /* Initialize the IO expander Control register to configure the IO ports
-         * as outputs and set the output to low by default */
+         * as outputs and set the output*/
         if (file < 0)
         {
             file = open(("/dev/i2c-" + std::to_string(bus)).c_str(),
@@ -404,7 +409,7 @@ class IoExpander
             std::bitset<8> currCtrlVal(read1);
             std::bitset<8> currOutVal(read2);
 
-            /* Set zero only at bit position that we have a NVMe drive (i.e.
+            /* Set 0/1 only at bit position that we have a NVMe drive (i.e.
              * ignore where ioMap is "-"). We do not want to touch other
              * bits */
             for (uint8_t bit = 0; bit < 8; bit++)
@@ -413,7 +418,11 @@ class IoExpander
                 {
                     writeRequired = true;
                     currCtrlVal.reset(bit);
-                    currOutVal.reset(bit);
+                    /* Set the output register to drive the OE pin high thereby
+                     * enabling the clock. Default to enabling the clock output
+                     * and once the HSBP's are detected the clocks will be
+                     * enabled/disabled depending on the drive status */
+                    currOutVal.set(bit);
                 }
             }
 
@@ -454,8 +463,7 @@ class IoExpander
         size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
         std::unordered_map<std::string, std::vector<std::string>>& ioMapIn,
         std::string& nameIn, std::string& typeIn) :
-        bus(busIn),
-        address(addressIn), confIORegAddr(confIORegAddrIn),
+        bus(busIn), address(addressIn), confIORegAddr(confIORegAddrIn),
         outCtrlBaseAddr(outCtrlBaseAddrIn),
         outCtrlByteCount(outCtrlByteCountIn), ioMap(std::move(ioMapIn)),
         name(std::move(nameIn)), type(std::move(typeIn))
@@ -683,9 +691,7 @@ struct Led : std::enable_shared_from_this<Led>
 struct Drive
 {
     Drive(std::string driveName, bool present, bool isOperational, bool nvme,
-          bool rebuilding) :
-        isNvme(nvme),
-        isPresent(present), name(driveName)
+          bool rebuilding) : isNvme(nvme), isPresent(present), name(driveName)
     {
         constexpr const char* basePath =
             "/xyz/openbmc_project/inventory/item/drive/";
@@ -856,9 +862,8 @@ struct Backplane : std::enable_shared_from_this<Backplane>
 
     Backplane(size_t busIn, size_t addressIn, size_t backplaneIndexIn,
               const std::string& nameIn) :
-        bus(busIn),
-        address(addressIn), backplaneIndex(backplaneIndexIn - 1), name(nameIn),
-        timer(boost::asio::steady_timer(io)),
+        bus(busIn), address(addressIn), backplaneIndex(backplaneIndexIn - 1),
+        name(nameIn), timer(boost::asio::steady_timer(io)),
         muxes(std::make_shared<boost::container::flat_set<Mux>>())
     {
     }
@@ -1327,8 +1332,7 @@ class AsyncCallbackHandler
   public:
     explicit AsyncCallbackHandler(std::function<void()> onSuccessIn,
                                   std::function<void()> onErrorIn) :
-        onSuccess(std::move(onSuccessIn)),
-        onError(std::move(onErrorIn))
+        onSuccess(std::move(onSuccessIn)), onError(std::move(onErrorIn))
     {
     }
 
