@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d81946d_41817df3",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-28T16:46:18Z",
+      "side": 1,
+      "message": "We should use spaces instead of tabs.  We may want to add a .clang-format file to catch this.",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 3
+      },
+      "revId": "4c4f2c79603b3943d531241e7a56c29a0e1c0240",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ff17c0_21feaf7e",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-28T16:46:18Z",
+      "side": 1,
+      "message": "typo: integrity",
+      "range": {
+        "startLine": 185,
+        "startChar": 38,
+        "endLine": 185,
+        "endChar": 49
+      },
+      "revId": "4c4f2c79603b3943d531241e7a56c29a0e1c0240",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7aff18c_2e901a15",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-28T16:46:18Z",
+      "side": 1,
+      "message": "typo: Output",
+      "range": {
+        "startLine": 421,
+        "startChar": 17,
+        "endLine": 421,
+        "endChar": 23
+      },
+      "revId": "4c4f2c79603b3943d531241e7a56c29a0e1c0240",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bb7a9c4_886d4928",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-28T16:46:18Z",
+      "side": 1,
+      "message": "typo: thereby",
+      "range": {
+        "startLine": 421,
+        "startChar": 57,
+        "endLine": 421,
+        "endChar": 63
+      },
+      "revId": "4c4f2c79603b3943d531241e7a56c29a0e1c0240",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
