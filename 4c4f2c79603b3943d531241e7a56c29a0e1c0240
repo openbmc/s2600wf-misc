@@ -72,6 +72,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1cad139_ae3391d4",
+        "filename": "hsbp-manager/src/hsbp_manager.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-31T18:31:58Z",
+      "side": 1,
+      "message": "Ahh, I think it\u0027s looking for a .clang-format at the root of the repo rather than in each subfolder. I pushed a change to move it (https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/82462) and rebased this change.",
+      "parentUuid": "65d1ecaa_894a7966",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 3
+      },
+      "revId": "4c4f2c79603b3943d531241e7a56c29a0e1c0240",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85ff17c0_21feaf7e",
