@@ -16,25 +16,27 @@
 
 #include "utils.hpp"
 
-#include <algorithm>
-#include <bitset>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_set.hpp>
-#include <filesystem>
-#include <forward_list>
-#include <fstream>
 #include <gpiod.hpp>
-#include <iostream>
-#include <list>
 #include <sdbusplus/asio/connection.hpp>
 #include <sdbusplus/asio/object_server.hpp>
 #include <sdbusplus/bus/match.hpp>
+
+#include <algorithm>
+#include <bitset>
+#include <filesystem>
+#include <forward_list>
+#include <fstream>
+#include <iostream>
+#include <list>
 #include <string>
 #include <utility>
 
-extern "C" {
+extern "C"
+{
 #include <i2c/smbus.h>
 #include <linux/i2c-dev.h>
 }
@@ -209,8 +211,8 @@ class ClockBuffer
         size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
         std::unordered_map<std::string, std::vector<std::string>>& byteMapIn,
         std::string& nameIn, std::string& typeIn) :
-        bus(busIn),
-        address(addressIn), modeOfOperation(std::move(modeOfOperationIn)),
+        bus(busIn), address(addressIn),
+        modeOfOperation(std::move(modeOfOperationIn)),
         outCtrlBaseAddr(outCtrlBaseAddrIn),
         outCtrlByteCount(outCtrlByteCountIn), byteMap(std::move(byteMapIn)),
         name(std::move(nameIn)), type(std::move(typeIn))
@@ -454,8 +456,7 @@ class IoExpander
         size_t outCtrlBaseAddrIn, size_t outCtrlByteCountIn,
         std::unordered_map<std::string, std::vector<std::string>>& ioMapIn,
         std::string& nameIn, std::string& typeIn) :
-        bus(busIn),
-        address(addressIn), confIORegAddr(confIORegAddrIn),
+        bus(busIn), address(addressIn), confIORegAddr(confIORegAddrIn),
         outCtrlBaseAddr(outCtrlBaseAddrIn),
         outCtrlByteCount(outCtrlByteCountIn), ioMap(std::move(ioMapIn)),
         name(std::move(nameIn)), type(std::move(typeIn))
@@ -595,8 +596,7 @@ struct Mux
 {
     Mux(size_t busIn, size_t addressIn, size_t channelsIn, size_t indexIn) :
         bus(busIn), address(addressIn), channels(channelsIn), index(indexIn)
-    {
-    }
+    {}
     size_t bus;
     size_t address;
     size_t channels;
@@ -683,9 +683,7 @@ struct Led : std::enable_shared_from_this<Led>
 struct Drive
 {
     Drive(std::string driveName, bool present, bool isOperational, bool nvme,
-          bool rebuilding) :
-        isNvme(nvme),
-        isPresent(present), name(driveName)
+          bool rebuilding) : isNvme(nvme), isPresent(present), name(driveName)
     {
         constexpr const char* basePath =
             "/xyz/openbmc_project/inventory/item/drive/";
@@ -853,15 +851,12 @@ struct Drive
 
 struct Backplane : std::enable_shared_from_this<Backplane>
 {
-
     Backplane(size_t busIn, size_t addressIn, size_t backplaneIndexIn,
               const std::string& nameIn) :
-        bus(busIn),
-        address(addressIn), backplaneIndex(backplaneIndexIn - 1), name(nameIn),
-        timer(boost::asio::steady_timer(io)),
+        bus(busIn), address(addressIn), backplaneIndex(backplaneIndexIn - 1),
+        name(nameIn), timer(boost::asio::steady_timer(io)),
         muxes(std::make_shared<boost::container::flat_set<Mux>>())
-    {
-    }
+    {}
     void populateAsset(const std::string& rootPath, const std::string& busname)
     {
         conn->async_method_call(
@@ -944,9 +939,9 @@ struct Backplane : std::enable_shared_from_this<Backplane>
         versionIface =
             objServer.add_interface("/xyz/openbmc_project/software/" + dbusName,
                                     "xyz.openbmc_project.Software.Version");
-        versionIface->register_property("Version", zeroPad(bootVer) + "." +
-                                                       zeroPad(fpgaVer) + "." +
-                                                       zeroPad(securityRev));
+        versionIface->register_property(
+            "Version", zeroPad(bootVer) + "." + zeroPad(fpgaVer) + "." +
+                           zeroPad(securityRev));
         versionIface->register_property(
             "Purpose",
             std::string(
@@ -1327,10 +1322,8 @@ class AsyncCallbackHandler
   public:
     explicit AsyncCallbackHandler(std::function<void()> onSuccessIn,
                                   std::function<void()> onErrorIn) :
-        onSuccess(std::move(onSuccessIn)),
-        onError(std::move(onErrorIn))
-    {
-    }
+        onSuccess(std::move(onSuccessIn)), onError(std::move(onErrorIn))
+    {}
 
     void setError()
     {
@@ -1586,8 +1579,8 @@ void updateAssets()
                     continue;
                 }
                 if (std::find(objDict.begin()->second.begin(),
-                              objDict.begin()->second.end(),
-                              assetTag) == objDict.begin()->second.end())
+                              objDict.begin()->second.end(), assetTag) ==
+                    objDict.begin()->second.end())
                 {
                     // no asset tag to associate to
                     continue;
@@ -1601,10 +1594,10 @@ void updateAssets()
                             values) {
                         if (ec2)
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Error Getting Config "
-                                      << ec2.message() << " "
-                                      << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Error Getting Config "
+                                << ec2.message() << " "
+                                << "\n";
                             drivesLoadedCallback->setError();
                             return;
                         }
@@ -1612,9 +1605,9 @@ void updateAssets()
 
                         if (findBus == values.end())
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Illegal interface at " << path
-                                      << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Illegal interface at "
+                                << path << "\n";
                             drivesLoadedCallback->setError();
                             return;
                         }
@@ -1655,9 +1648,9 @@ void updateAssets()
                         size_t muxIndex = 0;
 
                         // find the channel of the mux the drive is on
-                        std::ifstream nameFile("/sys/bus/i2c/devices/i2c-" +
-                                               std::to_string(muxBus) +
-                                               "/name");
+                        std::ifstream nameFile(
+                            "/sys/bus/i2c/devices/i2c-" +
+                            std::to_string(muxBus) + "/name");
                         if (!nameFile)
                         {
                             std::cerr << __FUNCTION__
@@ -1677,9 +1670,9 @@ void updateAssets()
                         if (findId == std::string::npos ||
                             findId + 1 >= nameStr.size())
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Illegal name file on bus " << muxBus
-                                      << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Illegal name file on bus "
+                                << muxBus << "\n";
                         }
 
                         std::string indexStr =
@@ -1742,9 +1735,9 @@ void updateAssets()
 
                         if (parent->drives.size() <= driveIndex)
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Illegal drive index at " << path
-                                      << " " << driveIndex << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Illegal drive index at "
+                                << path << " " << driveIndex << "\n";
                             drivesLoadedCallback->setError();
                             return;
                         }
@@ -1817,9 +1810,9 @@ void populateMuxes(std::shared_ptr<boost::container::flat_set<Mux>> muxes,
                             values) {
                         if (ec2)
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Error Getting Config "
-                                      << ec2.message() << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Error Getting Config "
+                                << ec2.message() << "\n";
                             return;
                         }
                         auto findBus = values.find("Bus");
@@ -1828,9 +1821,9 @@ void populateMuxes(std::shared_ptr<boost::container::flat_set<Mux>> muxes,
                         if (findBus == values.end() ||
                             findAddress == values.end())
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Illegal configuration at " << path
-                                      << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Illegal configuration at "
+                                << path << "\n";
                             return;
                         }
                         size_t bus = static_cast<size_t>(
@@ -1898,9 +1891,9 @@ void populateHsbpBackplanes(
                                 std::string, BasicVariantType>& resp) {
                         if (ec2)
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Error Getting Config "
-                                      << ec2.message() << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Error Getting Config "
+                                << ec2.message() << "\n";
                             backplanesLoadedCallback->setError();
                             return;
                         }
@@ -1929,9 +1922,9 @@ void populateHsbpBackplanes(
                         }
                         if (!bus || !address || !name || !backplaneIndex)
                         {
-                            std::cerr << __FUNCTION__
-                                      << ": Illegal configuration at " << path
-                                      << "\n";
+                            std::cerr
+                                << __FUNCTION__ << ": Illegal configuration at "
+                                << path << "\n";
                             backplanesLoadedCallback->setError();
                             return;
                         }
@@ -2079,8 +2072,8 @@ void setupBackplanesAndDrivesMatch()
                         /* Configuration is not loaded yet. Backplanes will be
                          * loaded
                          * once configuration and components are loaded. */
-                        std::cerr << __FUNCTION__
-                                  << ": Discarding Backplane match\n";
+                        std::cerr
+                            << __FUNCTION__ << ": Discarding Backplane match\n";
                         return;
                     }
 
@@ -2140,8 +2133,8 @@ void setupBackplanesAndDrivesMatch()
                          * loaded once
                          * configuration, components and backplanes are loaded.
                          */
-                        std::cerr << __FUNCTION__
-                                  << ": Discarding Drive match\n";
+                        std::cerr
+                            << __FUNCTION__ << ": Discarding Drive match\n";
                         return;
                     }
 
@@ -2231,7 +2224,6 @@ void loadIoExpanderInfo(
 
             for (auto& [path, objDict] : subtree)
             {
-
                 if (objDict.empty())
                 {
                     std::cerr << __FUNCTION__ << ": Subtree data corrupted !\n";
@@ -2373,7 +2365,6 @@ void loadClockBufferInfo(
 
             for (auto& [path, objDict] : subtree)
             {
-
                 if (objDict.empty())
                 {
                     std::cerr << __FUNCTION__ << ": Subtree data corrupted !\n";
@@ -2625,8 +2616,8 @@ void loadHsbpConfig()
                     for (const auto& [key, value] : resp)
                     {
                         if (std::find(hsbpConfig.supportedHsbps.begin(),
-                                      hsbpConfig.supportedHsbps.end(),
-                                      key) != hsbpConfig.supportedHsbps.end())
+                                      hsbpConfig.supportedHsbps.end(), key) !=
+                            hsbpConfig.supportedHsbps.end())
                         {
                             std::optional<std::vector<std::string>> hsbpMap;
                             hsbpMap = std::get<NvmeMapping>(value);
@@ -2793,9 +2784,8 @@ static void nvmeLvc3AlertHandler()
         [](const boost::system::error_code ec) {
             if (ec)
             {
-                std::cerr << __FUNCTION__
-                          << ": nvmealert event error: " << ec.message()
-                          << "\n";
+                std::cerr << __FUNCTION__ << ": nvmealert event error: "
+                          << ec.message() << "\n";
             }
             nvmeLvc3AlertHandler();
         });
