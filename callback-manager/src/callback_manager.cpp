@@ -199,9 +199,9 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
                 }
                 if constexpr (debug)
                 {
-                    std::cerr << "Set " << ledPair.first << " to "
-                              << std::boolalpha
-                              << std::get<bool>(ledPair.second) << "\n";
+                    std::cerr
+                        << "Set " << ledPair.first << " to " << std::boolalpha
+                        << std::get<bool>(ledPair.second) << "\n";
                 }
             },
             ledManagerBusname, ledPair.first, "org.freedesktop.DBus.Properties",
@@ -211,7 +211,6 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
 
 void createThresholdMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
 {
-
     static sdbusplus::bus::match_t match(
         static_cast<sdbusplus::bus_t&>(*conn),
         "type='signal',member='ThresholdAsserted'",
@@ -361,8 +360,9 @@ int main(int argc, char** argv)
     std::shared_ptr<sdbusplus::asio::dbus_interface> rootIface =
         objServer.add_interface(rootPath,
                                 "xyz.openbmc_project.CallbackManager");
-    rootIface->register_method("RetriggerLEDUpdate",
-                               [&conn]() { updateLedStatus(conn, true); });
+    rootIface->register_method("RetriggerLEDUpdate", [&conn]() {
+        updateLedStatus(conn, true);
+    });
     rootIface->initialize();
 
     std::shared_ptr<sdbusplus::asio::dbus_interface> inventoryIface =
