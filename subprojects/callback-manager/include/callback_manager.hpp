@@ -24,9 +24,9 @@ constexpr const char* warning = "warning";
 
 struct AssociationManager
 {
-    AssociationManager(sdbusplus::asio::object_server& objectServer,
-                       std::shared_ptr<sdbusplus::asio::connection>& conn) :
-        objectServer(objectServer),
+    AssociationManager(sdbusplus::asio::object_server& objectServerIn,
+                       std::shared_ptr<sdbusplus::asio::connection>& /*conn*/) :
+        objectServer(objectServerIn),
         association(objectServer.add_interface(rootPath, associationIface)),
         sensorAssociation(
             objectServer.add_interface(sensorPath, associationIface))
