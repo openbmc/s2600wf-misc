@@ -1,6 +1,6 @@
 # Callback Manager
 
-Author: James Feist  !jfei
+Author: James Feist !jfei
 
 Primary assignee: James Feist !jfei
 
@@ -29,9 +29,9 @@ The callback manager can change LED state in the below ways.
 1. Monitoring the sensor threshold interface.
 1. Monitoring critical / warning thresholds as Redfish does.
 
-Other interfaces specific interfaces can be added later if it makes sense.
-The reason it was designed this way is Redfish has the idea of a Global
-health state, and a component health state. We need to map these to the LED.
+Other interfaces specific interfaces can be added later if it makes sense. The
+reason it was designed this way is Redfish has the idea of a Global health
+state, and a component health state. We need to map these to the LED.
 
 ### Thresholds
 
@@ -48,8 +48,9 @@ There are two types of status associations, detailed in the Redfish health
 whitepaper.
 
 1. Global- These are the attributes to the global state (warning / critical).
-This is exposed by the callback manager for ease (xyz.openbmc_project.Inventory.Item.Global,
-path=/xyz/openbmc_project/CallbackManager)
+   This is exposed by the callback manager for ease
+   (xyz.openbmc_project.Inventory.Item.Global,
+   path=/xyz/openbmc_project/CallbackManager)
 1. Local- Any other warning / critical association.
 
 If the path for an association is Critical for Global & Local, the LED will be
