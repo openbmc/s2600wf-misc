@@ -1,0 +1,9 @@
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Submitted-by: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-at: Fri, 01 Aug 2025 14:17:02 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/29254
+Comments-Total: 1
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
