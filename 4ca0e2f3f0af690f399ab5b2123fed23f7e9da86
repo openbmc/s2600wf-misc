@@ -1,0 +1,8 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-by: <rashmi.r.v@intel.com>
+Submitted-at: Fri, 01 Aug 2025 12:04:57 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/s2600wf-misc/+/82301
+Comments-Total: 10
+Project: openbmc/s2600wf-misc
+Branch: refs/heads/master
