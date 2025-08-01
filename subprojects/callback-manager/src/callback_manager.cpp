@@ -184,6 +184,9 @@ void updateLedStatus(std::shared_ptr<sdbusplus::asio::connection>& conn,
                 ledsToSet.push_back(std::make_pair(okLedPath, true));
                 break;
             }
+            case (StatusSetting::none):
+            default:
+                break;
         }
     }
 
@@ -351,7 +354,7 @@ void createAssociationMatch(std::shared_ptr<sdbusplus::asio::connection>& conn)
         });
 }
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     boost::asio::io_context io;
     auto conn = std::make_shared<sdbusplus::asio::connection>(io);

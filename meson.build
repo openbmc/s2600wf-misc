@@ -7,4 +7,5 @@ project(
 )
 
 #Add subproject for hsbp-manager
-subdir('hsbp-manager')
+subproject('hsbp-manager')
+subproject('callback-manager')
