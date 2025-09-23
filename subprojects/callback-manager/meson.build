@@ -53,6 +53,8 @@ executable(
     include_directories: inc,
     cpp_args: cpp_args,
     dependencies: [boost, sdbusplus],
+    install: true,
+    install_dir: get_option('sbindir'),
 )
 
 # Systemd service files
